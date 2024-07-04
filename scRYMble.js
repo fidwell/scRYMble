@@ -10,6 +10,8 @@
 // @grant          GM_xmlhttpRequest
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js
 
+// @downloadURL https://update.greasyfork.org/scripts/1814/scRYMble.user.js
+// @updateURL https://update.greasyfork.org/scripts/1814/scRYMble.meta.js
 // ==/UserScript==
 
 //THANK YOU FOR THE NAME, LYNKALI!
@@ -324,7 +326,7 @@ function getPageArtist()
 
 function getAlbum()
 {
-    return $(".album_title:eq(0)").text();
+    return(($('.release_page meta[itemprop="name"]').attr("content"))).trim();
 }
 
 function isVariousArtists()
