@@ -16,6 +16,7 @@
 import { IDictionary } from "./models/IDictionary";
 import { ResponseDetails } from "./models/ResponseDetails";
 import ScrobbleRecord from "./models/ScrobbleRecord";
+import * as httpRequestHelper from "./services/httpRequestHelper";
 
 let toScrobble: ScrobbleRecord[] = [];
 let currentlyScrobbling = -1;
@@ -294,16 +295,7 @@ function submitThisTrack(): void {
     postdataStr = `${postdataStr}${encodeURIComponent(currKey)}=${encodeURIComponent(postdata[currKey])}`;
   }
 
-  GM_xmlhttpRequest({
-    method: "POST",
-    url: submitURL,
-    data: postdataStr,
-    headers: {
-      "User-agent": "Mozilla/4.0 (compatible) Greasemonkey",
-      "Content-type": "application/x-www-form-urlencoded"
-    },
-    onload: acceptSubmitResponseSingle
-  });
+  httpRequestHelper.post(submitURL, postdataStr, acceptSubmitResponseSingle);
 }
 
 function npNextTrack() {
@@ -332,16 +324,7 @@ function npNextTrack() {
     postdataStr = postdataStr + encodeURIComponent(currKey) + "=" + encodeURIComponent(postdata[currKey]);
   }
 
-  GM_xmlhttpRequest({
-    method: "POST",
-    url: npURL,
-    data: postdataStr,
-    headers: {
-      "User-agent": "Mozilla/4.0 (compatible) Greasemonkey",
-      "Content-type": "application/x-www-form-urlencoded"
-    },
-    onload: acceptNPResponse
-  });
+  httpRequestHelper.post(npURL, postdataStr, acceptNPResponse);
 }
 
 function timertick() {
@@ -408,16 +391,7 @@ function handshake(isBatch: boolean) {
   const auth = hex_md5(`${hex_md5(password)}${timestamp}`);
 
   const handshakeURL = `http://post.audioscrobbler.com/?hs=true&p=1.2&c=scr&v=1.0&u=${user}&t=${timestamp}&a=${auth}`;
-
-  GM_xmlhttpRequest({
-    method: "GET",
-    url: handshakeURL,
-    headers: {
-      "User-agent": "Mozilla/4.0 (compatible) Greasemonkey"
-    },
-    onload: isBatch ? acceptHandshakeBatch : acceptHandshakeSingle
-  });
-
+  httpRequestHelper.get(handshakeURL, isBatch ? acceptHandshakeBatch : acceptHandshakeSingle);
 }
 
 function handshakeBatch(): void {
