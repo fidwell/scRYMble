@@ -76,7 +76,7 @@ function acceptSubmitResponseBatch(responseDetails: ResponseDetails) {
 
 function acceptNPResponse(responseDetails: ResponseDetails) {
   if (responseDetails.status === 200) {
-    if (responseDetails.responseText.indexOf("OK") == -1) {
+    if (responseDetails.responseText.indexOf("OK") === -1) {
       alertSubmitFailed(responseDetails);
     }
   } else {
@@ -96,34 +96,33 @@ function buildListOfSongsToScrobble() {
 
       if (isVariousArtists()) {
         const firstDash = songTitle.indexOf(" - ");
-        if (firstDash == -1) // no dash exists! must be a single artist with " / " in the name or v/a with unscrobbleable list
+        if (firstDash === -1) // no dash exists! must be a single artist with " / " in the name or v/a with unscrobbleable list
         {
           artist = getPageArtist();
           if (artist.indexOf("Various Artists") > -1) {
-            artist = $(".album_title:eq(0)").text()
-            //canscrobble = 0;
+            artist = $(".album_title:eq(0)").text();
           }
-        }
-        else {
+        } else {
           artist = songTitle.substring(0, firstDash);
           songTitle = songTitle.substring(firstDash + 3);
         }
-      }
-      else {
-        artist = getPageArtist()
+      } else {
+        artist = getPageArtist();
         const title = $(song).find("span[itemprop=\"name\"]");
-        if ($(title).html().indexOf("<a title=\"[Artist") == 0 && $(title).text().indexOf(" - ") > 0) {
+        if ($(title).html().indexOf("<a title=\"[Artist") === 0 && $(title).text().indexOf(" - ") > 0) {
           const firstDash = songTitle.indexOf(" - ");
           artist = songTitle.substring(0, firstDash);
           songTitle = songTitle.substring(firstDash + 3);
         }
       }
 
-      if ((songTitle.toLowerCase() == "untitled") || (songTitle.toLowerCase() == "untitled track") || (songTitle == "")) {
+      if ((songTitle.toLowerCase() === "untitled") || (songTitle.toLowerCase() === "untitled track") || (songTitle === "")) {
         songTitle = "[untitled]";
       }
 
-      while (songTitle.indexOf("  ") > 0) { songTitle = songTitle.replace("  ", " ") }
+      while (songTitle.indexOf("  ") > 0) {
+        songTitle = songTitle.replace("  ", " ");
+      }
       toScrobble[toScrobble.length] = new ScrobbleRecord(songTitle, artist, length);
     }
   });
@@ -137,7 +136,7 @@ function submitTracksBatch(sessID: string, submitURL: string) {
 
   let currTime = fetch_unix_timestamp();
   const hoursFudgeStr = prompt("How many hours ago did you listen to this?");
-  if (hoursFudgeStr != null) {
+  if (hoursFudgeStr !== null) {
     const album = getAlbum();
     const hoursFudge = parseFloat(hoursFudgeStr);
 

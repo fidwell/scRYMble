@@ -20,7 +20,9 @@ export default [
       ...ts.configs["strict"].rules,
       ...ts.configs["stylistic"].rules,
       "quotes": ["error", "double"],
-      "@typescript-eslint/no-explicit-any": "off"
+      "@typescript-eslint/no-explicit-any": "off",
+      "eqeqeq": ["error"],
+      "semi": [ "error", "always" ]
     }
   }
 ];
