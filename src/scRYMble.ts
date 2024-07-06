@@ -10,9 +10,9 @@
 // @grant        GM_setValue
 // @grant        GM_xmlhttpRequest
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js
+// @require      https://update.greasyfork.org/scripts/130/10066/Portable%20MD5%20Function.js
 // ==/UserScript==
 
-import { hex_md5 } from "./md5";
 import { IDictionary } from "./models/IDictionary";
 import { ResponseDetails } from "./models/ResponseDetails";
 
@@ -243,7 +243,7 @@ function elementsOnAndOff(state: boolean) {
       $(this).prop("disabled", !state);
     } catch (e) {
       console.log(e);
-     }
+    }
   });
 }
 
