@@ -17,7 +17,7 @@
 // - Modularize code
 // - Upgrade (or omit) jQuery (https://code.jquery.com/jquery-3.7.1.min.js)
 
-function hex_md5(s: string) { throw new Error("Not implemented"); }
+import { hex_md5 } from "./md5";
 
 let toScrobble = new Array();
 let currentlyScrobbling = -1;
