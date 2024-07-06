@@ -12,11 +12,6 @@
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js
 // ==/UserScript==
 
-// To do
-// - Lint MD5
-// - Modularize code
-// - Upgrade (or omit) jQuery (https://code.jquery.com/jquery-3.7.1.min.js)
-
 import { hex_md5 } from "./md5";
 import { IDictionary } from "./models/IDictionary";
 import { ResponseDetails } from "./models/ResponseDetails";
@@ -104,9 +99,7 @@ function acceptSubmitResponse(responseDetails: ResponseDetails, isBatch: boolean
 }
 
 function alertSubmitFailed(responseDetails: ResponseDetails) {
-  alert("track submit failed: " + responseDetails.status +
-    ' ' + responseDetails.statusText + '\n\n' +
-    'Data:\n' + responseDetails.responseText);
+  alert(`Track submit failed: ${responseDetails.status} ${responseDetails.statusText}\n\nData:\n${responseDetails.responseText}`);
 }
 
 function acceptSubmitResponseSingle(responseDetails: ResponseDetails) {
@@ -130,12 +123,12 @@ function acceptNPResponse(responseDetails: ResponseDetails) {
 function buildListOfSongsToScrobble() {
   toScrobble = [];
 
-  $.each($('.scrymblechk'), function () {
-    if ($(this).is(':checked')) {
+  $.each($(".scrymblechk"), function () {
+    if ($(this).is(":checked")) {
       const song = $(this).parent().parent();
-      let songTitle = $(song).find('span[itemprop="name"]').text();
+      let songTitle = $(song).find("span[itemprop=\"name\"]").text();
       let artist = getPageArtist();
-      const length = $(song).find('.tracklist_duration').text();
+      const length = $(song).find(".tracklist_duration").text();
 
       if (isVariousArtists()) {
         const firstDash = songTitle.indexOf(" - ");
@@ -154,8 +147,8 @@ function buildListOfSongsToScrobble() {
       }
       else {
         artist = getPageArtist()
-        const title = $(song).find('span[itemprop="name"]');
-        if ($(title).html().indexOf('<a title="[Artist') == 0 && $(title).text().indexOf(' - ') > 0) {
+        const title = $(song).find("span[itemprop=\"name\"]");
+        if ($(title).html().indexOf("<a title=\"[Artist") == 0 && $(title).text().indexOf(" - ") > 0) {
           const firstDash = songTitle.indexOf(" - ");
           artist = songTitle.substring(0, firstDash);
           songTitle = songTitle.substring(firstDash + 3);
@@ -365,12 +358,12 @@ function npNextTrack() {
   }
 
   GM_xmlhttpRequest({
-    method: 'POST',
+    method: "POST",
     url: npURL,
     data: postdataStr,
     headers: {
-      'User-agent': 'Mozilla/4.0 (compatible) Greasemonkey',
-      'Content-type': 'application/x-www-form-urlencoded'
+      "User-agent": "Mozilla/4.0 (compatible) Greasemonkey",
+      "Content-type": "application/x-www-form-urlencoded"
     },
     onload: acceptNPResponse
   });
