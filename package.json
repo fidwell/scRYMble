@@ -4,7 +4,8 @@
   "type": "module",
   "main": "scRYMble.js",
   "scripts": {
-    "build": "rollup -c",
+    "build": "npx eslint ./src/scRYMble.ts && rollup -c",
+    "lint-fix": "npx eslint ./src/scRYMble.ts --fix",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
