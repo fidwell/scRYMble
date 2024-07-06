@@ -12,21 +12,17 @@
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js
 // ==/UserScript==
 
-// To do:
-// - Add linter
-// - Modularize code
-// - Upgrade (or omit) jQuery (https://code.jquery.com/jquery-3.7.1.min.js)
-
 import { hex_md5 } from "./md5";
+import { IDictionary } from "./models/IDictionary";
+import { ResponseDetails } from "./models/ResponseDetails";
 
-let toScrobble = new Array();
+let toScrobble: ScrobbleRecord[] = [];
 let currentlyScrobbling = -1;
 let sessID = "";
 let submitURL = "";
 let npURL = "";
 let currTrackDuration = 0;
 let currTrackPlayTime = 0;
-let numChecks = 0;
 
 function confirmBrowseAway(oEvent: BeforeUnloadEvent) {
   // Todo: Update use of deprecated property
@@ -83,7 +79,7 @@ function fetch_unix_timestamp(): number {
   return parseInt(new Date().getTime().toString().substring(0, 10));
 }
 
-function acceptSubmitResponse(responseDetails: any, isBatch: boolean) {
+function acceptSubmitResponse(responseDetails: ResponseDetails, isBatch: boolean) {
   if (responseDetails.status === 200) {
     if (responseDetails.responseText.indexOf("OK") === -1) {
       alertSubmitFailed(responseDetails);
@@ -102,21 +98,19 @@ function acceptSubmitResponse(responseDetails: any, isBatch: boolean) {
   }
 }
 
-function alertSubmitFailed(responseDetails: any) {
-  alert("track submit failed: " + responseDetails.status +
-    ' ' + responseDetails.statusText + '\n\n' +
-    'Data:\n' + responseDetails.responseText);
+function alertSubmitFailed(responseDetails: ResponseDetails) {
+  alert(`Track submit failed: ${responseDetails.status} ${responseDetails.statusText}\n\nData:\n${responseDetails.responseText}`);
 }
 
-function acceptSubmitResponseSingle(responseDetails: any) {
+function acceptSubmitResponseSingle(responseDetails: ResponseDetails) {
   acceptSubmitResponse(responseDetails, false);
 }
 
-function acceptSubmitResponseBatch(responseDetails: any) {
+function acceptSubmitResponseBatch(responseDetails: ResponseDetails) {
   acceptSubmitResponse(responseDetails, true);
 }
 
-function acceptNPResponse(responseDetails: any) {
+function acceptNPResponse(responseDetails: ResponseDetails) {
   if (responseDetails.status === 200) {
     if (responseDetails.responseText.indexOf("OK") == -1) {
       alertSubmitFailed(responseDetails);
@@ -127,19 +121,17 @@ function acceptNPResponse(responseDetails: any) {
 }
 
 function buildListOfSongsToScrobble() {
-  toScrobble = new Array();
+  toScrobble = [];
 
-  $.each($('.scrymblechk'), function () {
-    if ($(this).is(':checked')) {
+  $.each($(".scrymblechk"), function () {
+    if ($(this).is(":checked")) {
       const song = $(this).parent().parent();
-      var songTitle = $(song).find('span[itemprop="name"]').text();
-      var artist = getPageArtist();
-      var length = $(song).find('.tracklist_duration').text();
-
-      ////
+      let songTitle = $(song).find("span[itemprop=\"name\"]").text();
+      let artist = getPageArtist();
+      const length = $(song).find(".tracklist_duration").text();
 
       if (isVariousArtists()) {
-        var firstDash = songTitle.indexOf(" - ");
+        const firstDash = songTitle.indexOf(" - ");
         if (firstDash == -1) // no dash exists! must be a single artist with " / " in the name or v/a with unscrobbleable list
         {
           artist = getPageArtist();
@@ -155,9 +147,9 @@ function buildListOfSongsToScrobble() {
       }
       else {
         artist = getPageArtist()
-        const title = $(song).find('span[itemprop="name"]');
-        if ($(title).html().indexOf('<a title="[Artist') == 0 && $(title).text().indexOf(' - ') > 0) {
-          var firstDash = songTitle.indexOf(" - ");
+        const title = $(song).find("span[itemprop=\"name\"]");
+        if ($(title).html().indexOf("<a title=\"[Artist") == 0 && $(title).text().indexOf(" - ") > 0) {
+          const firstDash = songTitle.indexOf(" - ");
           artist = songTitle.substring(0, firstDash);
           songTitle = songTitle.substring(firstDash + 3);
         }
@@ -167,8 +159,7 @@ function buildListOfSongsToScrobble() {
         songTitle = "[untitled]";
       }
 
-      ////
-      while (songTitle.indexOf('  ') > 0) { songTitle = songTitle.replace('  ', ' ') }
+      while (songTitle.indexOf("  ") > 0) { songTitle = songTitle.replace("  ", " ") }
       toScrobble[toScrobble.length] = new ScrobbleRecord(songTitle, artist, length);
     }
   });
@@ -197,8 +188,8 @@ function submitTracksBatch(sessID: string, submitURL: string) {
 
     let outstr = `Artist: ${getPageArtist()}\nAlbum: ${album}\n`;
 
-    for (let i = 0; i < toScrobble.length; i++) {
-      outstr += toScrobble[i].trackName + "(" + toScrobble[i].duration + ")\n";
+    for (const song of toScrobble) {
+      outstr = `${outstr}${song.trackName} (${song.duration})\n`;
     }
 
     const postdata = {} as IDictionary;
@@ -207,9 +198,9 @@ function submitTracksBatch(sessID: string, submitURL: string) {
       postdata[`a[${i}]`] = toScrobble[i].artist;
       postdata[`t[${i}]`] = toScrobble[i].trackName;
       postdata[`b[${i}]`] = album;
-      postdata[`n[${i}]`] = i + 1;
-      postdata[`l[${i}]`] = toScrobble[i].duration;
-      postdata[`i[${i}]`] = toScrobble[i].time;
+      postdata[`n[${i}]`] = `${i + 1}`;
+      postdata[`l[${i}]`] = `${toScrobble[i].duration}`;
+      postdata[`i[${i}]`] = `${toScrobble[i].time}`;
       postdata[`o[${i}]`] = "P";
       postdata[`r[${i}]`] = "";
       postdata[`m[${i}]`] = "";
@@ -219,7 +210,7 @@ function submitTracksBatch(sessID: string, submitURL: string) {
 
     let postdataStr = "";
     let firstTime = true;
-    for (let currKey in postdata) {
+    for (const currKey in postdata) {
       if (firstTime) {
         firstTime = false;
       } else {
@@ -250,7 +241,9 @@ function elementsOnAndOff(state: boolean) {
   $.each($(".scrymblechk"), function () {
     try {
       $(this).prop("disabled", !state);
-    } catch (e) { }
+    } catch (e) {
+      console.log(e);
+     }
   });
 }
 
@@ -283,9 +276,8 @@ function resetScrobbler(): void {
     progbar.style.width = "0%";
   }
 
-  toScrobble = new Array();
+  toScrobble = [];
   elementsOn();
-  numChecks = 0;
 }
 
 function scrobbleNextSong(): void {
@@ -301,15 +293,15 @@ function scrobbleNextSong(): void {
 
 function submitThisTrack(): void {
   const postdata = {} as IDictionary;
-  let i = 0;
+  const i = 0;
   const currTime = fetch_unix_timestamp();
 
   postdata[`a${i}`] = toScrobble[currentlyScrobbling].artist;
   postdata[`t${i}`] = toScrobble[currentlyScrobbling].trackName;
   postdata[`b${i}`] = getAlbum();
-  postdata[`n${i}`] = (currentlyScrobbling + 1);
-  postdata[`l${i}`] = toScrobble[currentlyScrobbling].duration;
-  postdata[`i${i}`] = currTime - toScrobble[currentlyScrobbling].duration;
+  postdata[`n${i}`] = `${currentlyScrobbling + 1}`;
+  postdata[`l${i}`] = `${toScrobble[currentlyScrobbling].duration}`;
+  postdata[`i${i}`] = `${currTime - toScrobble[currentlyScrobbling].duration}`;
   postdata[`o${i}`] = "P";
   postdata[`r${i}`] = "";
   postdata[`m${i}`] = "";
@@ -318,7 +310,7 @@ function submitThisTrack(): void {
 
   let postdataStr = "";
   let firstTime = true;
-  for (let currKey in postdata) {
+  for (const currKey in postdata) {
     if (firstTime) {
       firstTime = false;
     } else {
@@ -339,20 +331,13 @@ function submitThisTrack(): void {
   });
 }
 
-interface IDictionary {
-  [index: string]: any;
-}
-
 function npNextTrack() {
   const postdata = {} as IDictionary;
-  let i = 0;
-  const currTime = fetch_unix_timestamp();
-
   postdata["a"] = toScrobble[currentlyScrobbling].artist;
   postdata["t"] = toScrobble[currentlyScrobbling].trackName;
   postdata["b"] = getAlbum();
-  postdata["n"] = currentlyScrobbling + 1;
-  postdata["l"] = toScrobble[currentlyScrobbling].duration;
+  postdata["n"] = `${currentlyScrobbling + 1}`;
+  postdata["l"] = `${toScrobble[currentlyScrobbling].duration}`;
   postdata["m"] = "";
   postdata["s"] = sessID;
 
@@ -363,22 +348,22 @@ function npNextTrack() {
 
   let postdataStr = "";
   let firstTime = true;
-  for (let currKey in postdata) {
+  for (const currKey in postdata) {
     if (firstTime) {
       firstTime = false;
     } else {
-      postdataStr = postdataStr + "&";
+      postdataStr = `${postdataStr}&`;
     }
     postdataStr = postdataStr + encodeURIComponent(currKey) + "=" + encodeURIComponent(postdata[currKey]);
   }
 
   GM_xmlhttpRequest({
-    method: 'POST',
+    method: "POST",
     url: npURL,
     data: postdataStr,
     headers: {
-      'User-agent': 'Mozilla/4.0 (compatible) Greasemonkey',
-      'Content-type': 'application/x-www-form-urlencoded'
+      "User-agent": "Mozilla/4.0 (compatible) Greasemonkey",
+      "Content-type": "application/x-www-form-urlencoded"
     },
     onload: acceptNPResponse
   });
@@ -405,15 +390,15 @@ function timertick() {
   }
 }
 
-function acceptHandshakeSingle(responseDetails: any) {
+function acceptHandshakeSingle(responseDetails: ResponseDetails) {
   acceptHandshake(responseDetails, false);
 }
 
-function acceptHandshakeBatch(responseDetails: any) {
+function acceptHandshakeBatch(responseDetails: ResponseDetails) {
   acceptHandshake(responseDetails, true);
 }
 
-function acceptHandshake(responseDetails: any, isBatch: boolean) {
+function acceptHandshake(responseDetails: ResponseDetails, isBatch: boolean) {
   if (responseDetails.status === 200) {
     const lines = responseDetails.responseText.split("\n");
     if (lines[0].indexOf("OK") === -1) {
@@ -434,12 +419,12 @@ function acceptHandshake(responseDetails: any, isBatch: boolean) {
   }
 }
 
-function alertHandshakeFailed(responseDetails: any) {
+function alertHandshakeFailed(responseDetails: ResponseDetails) {
   alert(`Handshake failed: ${responseDetails.status} ${responseDetails.statusText}\n\nData:\n${responseDetails.responseText}`);
 }
 
 function handshake(isBatch: boolean) {
-  const user = $("#scrobbleusername").val() ?? "";
+  const user = $("#scrobbleusername").val()?.toString() ?? "";
   const password = $("#scrobblepassword").val()?.toString() ?? "";
   GM_setValue("user", user);
   GM_setValue("pass", password);
@@ -481,7 +466,6 @@ function handshakeBatch(): void {
   eleButtonDiv.innerHTML = "<table border='0' cellpadding='0' cellspacing='2'><tr><td  width='105' ><input type='checkbox' name='allornone' id='allornone' style='vertical-align:middle' checked='checked'>&nbsp;<label for='allornone' style='font-size:60%'>select&nbsp;all/none</label><br/><table border='2' cellpadding='0' cellspacing='0'><tr><td style='height:50px;width:103px;background:url(http://cdn.last.fm/flatness/logo_black.3.png) no-repeat;color:#fff'><marquee scrollamount='3' scrolldelay='200' behavior='alternate' style='font-size:80%;font-family:sans-serif;position:relative;top:17px' id='scrymblemarquee'>&nbsp;</marquee></td></tr><tr><td style='background-color:#000033'><div style='position:relative;background-color:#ff0000;width:0%;max-height:5px;left:0px;top:0px;' id='progbar'>&nbsp;</div></td></tr></table></td><td>user: <input type='text' size='16' id='scrobbleusername' value = '" + GM_getValue("user", "") + "' /><br />pass: <input type='password' size='16' id='scrobblepassword' value = '" + GM_getValue("pass", "") + "'></input><br /><input type='button' id='scrobblenow' value = 'Scrobble in real-time' /> <input type='button' id='scrobblethen' value = 'Scrobble a previous play' /></td></tr></table>";
   eleButtonDiv.style.textAlign = "right";
 
-  const buttonDivParent = document.getElementById("h_album");
   $(eleTrackTable).after(eleButtonDiv);
 
   const eleScrobbleNow = document.getElementById("scrobblenow");
