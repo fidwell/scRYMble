@@ -14,7 +14,7 @@ _To do: Add link to GreasyFork when it's available._
 
 Visit any release page on RateYourMusic (`https://rateyourmusic.com/release/*`) that has a tracklist. scRYMble will add scrobbling controls below the tracklist:
 
-_To do: insert screenshot here._
+![image](https://github.com/fidwell/scRYMble/assets/5436387/c9331226-ed27-4e23-acde-9ec836f4195f)
 
 Fill your last.fm username and password. You can also check and uncheck tracks you wish to scrobble or ignore.
 
