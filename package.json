@@ -1,18 +1,24 @@
 {
   "name": "scrymble",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "module",
   "main": "scRYMble.js",
   "scripts": {
     "build": "eslint . && rollup -c",
     "lint": "eslint .",
-    "lint-fix": "eslint . --fix",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint-fix": "eslint . --fix"
   },
-  "keywords": [],
-  "author": "",
+  "author": "bluetshirt",
+  "contributors": [
+    "fidwell",
+    "AnniesBoobs",
+    "BruceWayne",
+    "actually",
+    "Kronz",
+    "Carcinogeneration"
+  ],
   "license": "ISC",
-  "description": "",
+  "description": "Visit a release page on rateyourmusic.com and scrobble the songs you see!",
   "devDependencies": {
     "@eslint/js": "^9.6.0",
     "@types/eslint__js": "^8.42.3",
