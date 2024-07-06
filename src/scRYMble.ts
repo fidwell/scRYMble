@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         scRYMble
-// @version      2.0
+// @version      __buildDate__
 // @description  Visit a release page on rateyourmusic.com and scrobble the songs you see!
 // @author       bluetshirt
 // @author       fidwell

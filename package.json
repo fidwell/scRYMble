@@ -24,5 +24,9 @@
     "tslib": "^2.6.3",
     "typescript": "^5.5.3",
     "typescript-eslint": "^7.15.0"
+  },
+  "dependencies": {
+    "@rollup/plugin-replace": "^5.0.7",
+    "@rollup/plugin-terser": "^0.4.4"
   }
 }
