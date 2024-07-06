@@ -3,7 +3,10 @@ import { ResponseDetails } from "./models/ResponseDetails";
 import ScrobbleRecord from "./models/ScrobbleRecord";
 import * as httpRequestHelper from "./services/httpRequestHelper";
 import { handshake } from "./services/lastfm";
+import scRYMbleUi from "./services/ui";
 import { fetch_unix_timestamp } from "./services/utilities";
+
+const ui = new scRYMbleUi();
 
 let toScrobble: ScrobbleRecord[] = [];
 let currentlyScrobbling = -1;
@@ -115,8 +118,8 @@ function buildListOfSongsToScrobble() {
       }
 
       if (songTitle.toLowerCase() === "untitled" ||
-          songTitle.toLowerCase() === "untitled track" ||
-          songTitle === "") {
+        songTitle.toLowerCase() === "untitled track" ||
+        songTitle === "") {
         songTitle = "[untitled]";
       }
 
@@ -232,13 +235,8 @@ function resetScrobbler(): void {
   currentlyScrobbling = -1;
   currTrackDuration = 0;
   currTrackPlayTime = 0;
-  setMarquee("&nbsp;");
-
-  const progbar = document.getElementById("progbar");
-  if (progbar !== null) {
-    progbar.style.width = "0%";
-  }
-
+  ui.setMarquee("&nbsp;");
+  ui.setProgressBar(0);
   toScrobble = [];
   elementsOn();
 }
@@ -298,7 +296,7 @@ function npNextTrack() {
   currTrackDuration = toScrobble[currentlyScrobbling].duration;
   currTrackPlayTime = 0;
 
-  setMarquee("toScrobble[currentlyScrobbling].trackName");
+  ui.setMarquee("toScrobble[currentlyScrobbling].trackName");
 
   let postdataStr = "";
   let firstTime = true;
@@ -317,9 +315,8 @@ function npNextTrack() {
 function timertick() {
   let again = true;
   if (currentlyScrobbling !== -1) {
-    const progbar = document.getElementById("progbar");
-    if (progbar !== null && currTrackDuration !== 0) {
-      progbar.style.width = `${100 * currTrackPlayTime / currTrackDuration}%`;
+    if (currTrackDuration !== 0) {
+      ui.setProgressBar(100 * currTrackPlayTime / currTrackDuration);
     }
 
     currTrackPlayTime++;
@@ -330,6 +327,7 @@ function timertick() {
     }
 
   }
+
   if (again) {
     window.setTimeout(timertick, 1000);
   }
@@ -373,48 +371,11 @@ function handshakeBatch(): void {
 }
 
 (function () {
-  const eleTrackTable = $("#tracks");
-  if (eleTrackTable !== undefined) {
-    let n = 0;
-    const chkbox = "<span style=\"float:left;\"><input type=\"checkbox\" class=\"scrymblechk\" id=\"chktrackNUM\" checked=\"checked\"></span>";
-    $.each($("#tracks > .track > .tracklist_line"), function () {
-      if ($(this).find(".tracklist_num:eq(0)").text() !== "\n                     \n                  ") {
-        n++;
-        $(this).prepend(chkbox.replace("NUM", `${n}`));
-      }
-    });
+  if (!ui.isEnabled) {
+    return;
   }
 
-  const eleButtonDiv = document.createElement("DIV");
-  eleButtonDiv.innerHTML = "<table border='0' cellpadding='0' cellspacing='2'><tr><td  width='105' ><input type='checkbox' name='allornone' id='allornone' style='vertical-align:middle' checked='checked'>&nbsp;<label for='allornone' style='font-size:60%'>select&nbsp;all/none</label><br/><table border='2' cellpadding='0' cellspacing='0'><tr><td style='height:50px;width:103px;background:url(http://cdn.last.fm/flatness/logo_black.3.png) no-repeat;color:#fff'><marquee scrollamount='3' scrolldelay='200' behavior='alternate' style='font-size:80%;font-family:sans-serif;position:relative;top:17px' id='scrymblemarquee'>&nbsp;</marquee></td></tr><tr><td style='background-color:#000033'><div style='position:relative;background-color:#ff0000;width:0%;max-height:5px;left:0px;top:0px;' id='progbar'>&nbsp;</div></td></tr></table></td><td>user: <input type='text' size='16' id='scrobbleusername' value = '" + GM_getValue("user", "") + "' /><br />pass: <input type='password' size='16' id='scrobblepassword' value = '" + GM_getValue("pass", "") + "'></input><br /><input type='button' id='scrobblenow' value = 'Scrobble in real-time' /> <input type='button' id='scrobblethen' value = 'Scrobble a previous play' /></td></tr></table>";
-  eleButtonDiv.style.textAlign = "right";
-
-  $(eleTrackTable).after(eleButtonDiv);
-
-  const eleScrobbleNow = document.getElementById("scrobblenow");
-  eleScrobbleNow?.addEventListener("click", startScrobble, true);
-
-  const eleAllOrNone = document.getElementById("allornone");
-  eleAllOrNone?.addEventListener("click", allOrNoneClick, true);
-
-  document.getElementById("scrobblethen")?.addEventListener("click", handshakeBatch, true);
-
+  ui.hookUpScrobbleNow(startScrobble);
+  ui.hookUpScrobbleThen(handshakeBatch);
   window.addEventListener("beforeunload", confirmBrowseAway, true);
 })();
-
-function allOrNoneClick(): void {
-  window.setTimeout(allOrNoneAction, 10);
-}
-
-function allOrNoneAction() {
-  $.each($(".scrymblechk"), function () {
-    $(this).prop("checked", $("#allornone").is(":checked"));
-  });
-}
-
-function setMarquee(value: string) {
-  const marquee = document.getElementById("scrymblemarquee");
-  if (marquee !== null) {
-    marquee.innerHTML = value;
-  }
-}
