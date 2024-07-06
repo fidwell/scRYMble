@@ -25,8 +25,6 @@ let currTrackDuration = 0;
 let currTrackPlayTime = 0;
 
 function confirmBrowseAway(oEvent: BeforeUnloadEvent) {
-  // Todo: Update use of deprecated property
-  // https://developer.mozilla.org/en-US/docs/Web/API/BeforeUnloadEvent/returnValue
   if (currentlyScrobbling !== -1)
     oEvent.returnValue = "You are currently scrobbling a record. Leaving the page now will prevent future tracks from this release from scrobbling.";
 }

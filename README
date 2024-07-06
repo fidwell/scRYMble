@@ -1,0 +1,21 @@
+# scRYMble
+
+Visit a release page on [rateyourmusic.com](https://rateyourmusic.com/) and scrobble the songs you see!
+
+## Usage
+
+1. Visit Rate Your Music in Firefox.
+2. Search for the album you're about to listen to (or just listened to).
+3. Visit the release page for that album.
+4. Type in the last.fm username and password in the box embedded within the page.
+5. Click "Scrobble in real-time" or "Scrobble a previous play".
+
+## About
+
+scRYMble was created by [bluetshirt](https://rateyourmusic.com/~bluetshirt) in 2009.
+
+### Credits
+
+- Original author: bluetshirt
+- Name: lynkali 
+- Useful tweaks and bug fixes: fidwell, AnniesBoobs, BruceWayne,  \_Andrew\_, Kronz, Carcinogeneration
