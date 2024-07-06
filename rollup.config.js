@@ -1,6 +1,7 @@
 import replace from "@rollup/plugin-replace";
 import terser from "@rollup/plugin-terser";
 import typescript from "rollup-plugin-typescript2";
+import { scRYMbleBanner } from "./scRYMbleBanner.js";
 
 function pad(value) {
   return `00${value}`.slice(-2);
@@ -20,10 +21,12 @@ export default {
   ],
   output: [
     {
+      banner: scRYMbleBanner,
       file: "dist/scRYMble.js",
       format: "cjs"
     },
     {
+      banner: scRYMbleBanner,
       file: "dist/scRYMble.min.js",
       format: "iife",
       plugins: [
