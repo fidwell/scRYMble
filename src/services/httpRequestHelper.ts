@@ -1,6 +1,6 @@
 import { ResponseDetails } from "../models/ResponseDetails";
 
-export function get(url: string, onload: (responseDetails: ResponseDetails) => void) {
+export function httpGet(url: string, onload: (responseDetails: ResponseDetails) => void) {
   GM_xmlhttpRequest({
     method: "GET",
     url,
@@ -11,7 +11,7 @@ export function get(url: string, onload: (responseDetails: ResponseDetails) => v
   });
 }
 
-export function post(url: string, data: string, onload: (responseDetails: ResponseDetails) => void): void {
+export function httpPost(url: string, data: string, onload: (responseDetails: ResponseDetails) => void): void {
   GM_xmlhttpRequest({
     method: "POST",
     url,

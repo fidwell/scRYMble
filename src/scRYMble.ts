@@ -2,6 +2,8 @@ import { IDictionary } from "./models/IDictionary";
 import { ResponseDetails } from "./models/ResponseDetails";
 import ScrobbleRecord from "./models/ScrobbleRecord";
 import * as httpRequestHelper from "./services/httpRequestHelper";
+import { handshake } from "./services/lastfm";
+import { fetch_unix_timestamp } from "./services/utilities";
 
 let toScrobble: ScrobbleRecord[] = [];
 let currentlyScrobbling = -1;
@@ -37,10 +39,6 @@ function isVariousArtists(): boolean {
   const artist = getPageArtist();
   return artist.indexOf("Various Artists") > -1 ||
     artist.indexOf(" / ") > -1;
-}
-
-function fetch_unix_timestamp(): number {
-  return parseInt(new Date().getTime().toString().substring(0, 10));
 }
 
 function acceptSubmitResponse(responseDetails: ResponseDetails, isBatch: boolean) {
@@ -252,7 +250,7 @@ function scrobbleNextSong(): void {
     resetScrobbler();
   } else {
     window.setTimeout(timertick, 10);
-    handshake(false);
+    handshake(acceptHandshakeSingle);
   }
 }
 
@@ -284,7 +282,7 @@ function submitThisTrack(): void {
     postdataStr = `${postdataStr}${encodeURIComponent(currKey)}=${encodeURIComponent(postdata[currKey])}`;
   }
 
-  httpRequestHelper.post(submitURL, postdataStr, acceptSubmitResponseSingle);
+  httpRequestHelper.httpPost(submitURL, postdataStr, acceptSubmitResponseSingle);
 }
 
 function npNextTrack() {
@@ -313,7 +311,7 @@ function npNextTrack() {
     postdataStr = postdataStr + encodeURIComponent(currKey) + "=" + encodeURIComponent(postdata[currKey]);
   }
 
-  httpRequestHelper.post(npURL, postdataStr, acceptNPResponse);
+  httpRequestHelper.httpPost(npURL, postdataStr, acceptNPResponse);
 }
 
 function timertick() {
@@ -370,21 +368,8 @@ function alertHandshakeFailed(responseDetails: ResponseDetails) {
   alert(`Handshake failed: ${responseDetails.status} ${responseDetails.statusText}\n\nData:\n${responseDetails.responseText}`);
 }
 
-function handshake(isBatch: boolean) {
-  const user = $("#scrobbleusername").val()?.toString() ?? "";
-  const password = $("#scrobblepassword").val()?.toString() ?? "";
-  GM_setValue("user", user);
-  GM_setValue("pass", password);
-
-  const timestamp = fetch_unix_timestamp();
-  const auth = hex_md5(`${hex_md5(password)}${timestamp}`);
-
-  const handshakeURL = `http://post.audioscrobbler.com/?hs=true&p=1.2&c=scr&v=1.0&u=${user}&t=${timestamp}&a=${auth}`;
-  httpRequestHelper.get(handshakeURL, isBatch ? acceptHandshakeBatch : acceptHandshakeSingle);
-}
-
 function handshakeBatch(): void {
-  handshake(true);
+  handshake(acceptHandshakeBatch);
 }
 
 (function () {
