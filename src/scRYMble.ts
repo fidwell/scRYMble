@@ -11,9 +11,12 @@ let npURL = "";
 let currTrackDuration = 0;
 let currTrackPlayTime = 0;
 
-function confirmBrowseAway(oEvent: BeforeUnloadEvent) {
-  if (currentlyScrobbling !== -1)
-    oEvent.returnValue = "You are currently scrobbling a record. Leaving the page now will prevent future tracks from this release from scrobbling.";
+function confirmBrowseAway(oEvent: BeforeUnloadEvent): string {
+  if (currentlyScrobbling !== -1) {
+    oEvent.preventDefault();
+    return "You are currently scrobbling a record. Leaving the page now will prevent future tracks from this release from scrobbling.";
+  }
+  return "";
 }
 
 function getPageArtist(): string {
