@@ -2,8 +2,8 @@ export const scRYMbleBanner = `// ==UserScript==
 // @name         scRYMble
 // @version      __buildDate__
 // @description  Visit a release page on rateyourmusic.com and scrobble the songs you see!
-// @author       bluetshirt
 // @author       fidwell
+// @icon         https://e.snmc.io/2.5/img/sonemic.png
 // @namespace    https://github.com/fidwell/scRYMble
 // @include      https://rateyourmusic.com/release/*
 // @grant        GM_getValue
