@@ -1,3 +1,4 @@
+import stylisticTs from "@stylistic/eslint-plugin-ts";
 import ts from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
 
@@ -12,7 +13,8 @@ export default [
       }
     },
     plugins: {
-      "@typescript-eslint": ts
+      "@typescript-eslint": ts,
+      "@stylistic/ts": stylisticTs
     },
     rules: {
       ...ts.configs["recommended"].rules,
@@ -22,7 +24,9 @@ export default [
       "quotes": ["error", "double"],
       "@typescript-eslint/no-explicit-any": "off",
       "eqeqeq": ["error"],
-      "semi": [ "error", "always" ]
+      "@stylistic/ts/semi": [ "error", "always" ],
+      "@stylistic/ts/brace-style": [ "error" ],
+      "@stylistic/ts/no-extra-parens": [ "error" ]
     }
   }
 ];

@@ -96,8 +96,8 @@ function buildListOfSongsToScrobble() {
 
       if (isVariousArtists()) {
         const firstDash = songTitle.indexOf(" - ");
-        if (firstDash === -1) // no dash exists! must be a single artist with " / " in the name or v/a with unscrobbleable list
-        {
+        if (firstDash === -1) {
+          // no dash exists! must be a single artist with " / " in the name or v/a with unscrobbleable list
           artist = getPageArtist();
           if (artist.indexOf("Various Artists") > -1) {
             artist = $(".album_title:eq(0)").text();
@@ -116,7 +116,9 @@ function buildListOfSongsToScrobble() {
         }
       }
 
-      if ((songTitle.toLowerCase() === "untitled") || (songTitle.toLowerCase() === "untitled track") || (songTitle === "")) {
+      if (songTitle.toLowerCase() === "untitled" ||
+          songTitle.toLowerCase() === "untitled track" ||
+          songTitle === "") {
         songTitle = "[untitled]";
       }
 
@@ -141,7 +143,7 @@ function submitTracksBatch(sessID: string, submitURL: string) {
     const hoursFudge = parseFloat(hoursFudgeStr);
 
     if (!isNaN(hoursFudge)) {
-      currTime = currTime - (hoursFudge * 60 * 60);
+      currTime = currTime - hoursFudge * 60 * 60;
     }
 
     for (let i = toScrobble.length - 1; i >= 0; i--) {

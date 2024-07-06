@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "@rollup/plugin-replace": "^5.0.7",
-    "@rollup/plugin-terser": "^0.4.4"
+    "@rollup/plugin-terser": "^0.4.4",
+    "@stylistic/eslint-plugin-ts": "^2.3.0"
   }
 }
