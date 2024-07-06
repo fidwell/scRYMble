@@ -1,13 +1,29 @@
-import eslint from "@eslint/js";
-import tseslint from "typescript-eslint";
+import ts from "@typescript-eslint/eslint-plugin";
+import tsParser from "@typescript-eslint/parser";
 
 export default [
-  eslint.configs.recommended,
-  ...tseslint.configs.strict,
-  ...tseslint.configs.stylistic,
   {
+    files: ["**/*.ts"],
+    ignores: [
+      "src/md5.ts"
+    ],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        project: "./tsconfig.json",
+        sourceType: "module"
+      }
+    },
+    plugins: {
+      "@typescript-eslint": ts
+    },
     rules: {
-      "quotes": [2, "double"]
+      ...ts.configs["recommended"].rules,
+      ...ts.configs["recommended-requiring-type-checking"].rules,
+      ...ts.configs["strict"].rules,
+      ...ts.configs["stylistic"].rules,
+      "quotes": ["error", "double"],
+      "@typescript-eslint/no-explicit-any": "off"
     }
   }
 ];

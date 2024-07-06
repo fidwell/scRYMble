@@ -198,9 +198,9 @@ function submitTracksBatch(sessID: string, submitURL: string) {
       postdata[`a[${i}]`] = toScrobble[i].artist;
       postdata[`t[${i}]`] = toScrobble[i].trackName;
       postdata[`b[${i}]`] = album;
-      postdata[`n[${i}]`] = i + 1;
-      postdata[`l[${i}]`] = toScrobble[i].duration;
-      postdata[`i[${i}]`] = toScrobble[i].time;
+      postdata[`n[${i}]`] = `${i + 1}`;
+      postdata[`l[${i}]`] = `${toScrobble[i].duration}`;
+      postdata[`i[${i}]`] = `${toScrobble[i].time}`;
       postdata[`o[${i}]`] = "P";
       postdata[`r[${i}]`] = "";
       postdata[`m[${i}]`] = "";
@@ -299,9 +299,9 @@ function submitThisTrack(): void {
   postdata[`a${i}`] = toScrobble[currentlyScrobbling].artist;
   postdata[`t${i}`] = toScrobble[currentlyScrobbling].trackName;
   postdata[`b${i}`] = getAlbum();
-  postdata[`n${i}`] = (currentlyScrobbling + 1);
-  postdata[`l${i}`] = toScrobble[currentlyScrobbling].duration;
-  postdata[`i${i}`] = currTime - toScrobble[currentlyScrobbling].duration;
+  postdata[`n${i}`] = `${currentlyScrobbling + 1}`;
+  postdata[`l${i}`] = `${toScrobble[currentlyScrobbling].duration}`;
+  postdata[`i${i}`] = `${currTime - toScrobble[currentlyScrobbling].duration}`;
   postdata[`o${i}`] = "P";
   postdata[`r${i}`] = "";
   postdata[`m${i}`] = "";
@@ -336,8 +336,8 @@ function npNextTrack() {
   postdata["a"] = toScrobble[currentlyScrobbling].artist;
   postdata["t"] = toScrobble[currentlyScrobbling].trackName;
   postdata["b"] = getAlbum();
-  postdata["n"] = currentlyScrobbling + 1;
-  postdata["l"] = toScrobble[currentlyScrobbling].duration;
+  postdata["n"] = `${currentlyScrobbling + 1}`;
+  postdata["l"] = `${toScrobble[currentlyScrobbling].duration}`;
   postdata["m"] = "";
   postdata["s"] = sessID;
 
@@ -424,7 +424,7 @@ function alertHandshakeFailed(responseDetails: ResponseDetails) {
 }
 
 function handshake(isBatch: boolean) {
-  const user = $("#scrobbleusername").val() ?? "";
+  const user = $("#scrobbleusername").val()?.toString() ?? "";
   const password = $("#scrobblepassword").val()?.toString() ?? "";
   GM_setValue("user", user);
   GM_setValue("pass", password);
