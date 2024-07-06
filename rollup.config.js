@@ -8,23 +8,25 @@ function pad(value) {
 
 const now = new Date(new Date().toUTCString().slice(0, -4));
 const setVersion = replace({
+  preventAssignment: true,
   __buildDate__: () => `2.${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`
 });
 
 export default {
   input: "src/scRYMble.ts",
-  plugins: [typescript()],
+  plugins: [
+    typescript(),
+    setVersion
+  ],
   output: [
     {
       file: "dist/scRYMble.js",
-      format: "cjs",
-      plugins: [setVersion]
+      format: "cjs"
     },
     {
       file: "dist/scRYMble.min.js",
       format: "iife",
       plugins: [
-        setVersion,
         terser({
           format: {
             comments: "all"
