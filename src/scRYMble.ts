@@ -17,21 +17,15 @@
 // - Modularize code
 // - Upgrade (or omit) jQuery (https://code.jquery.com/jquery-3.7.1.min.js)
 
-function startScrobble(): void {
-  console.log("startScrobble");
-}
-
-function handshakeBatch(): void {
-  console.log("handshakeBatch");
-}
+function hex_md5(s: string) { throw new Error("Not implemented"); }
 
 let toScrobble = new Array();
 let currentlyScrobbling = -1;
-let sessID = false;
-let submitURL = false;
-let npURL = false;
-let currTrackDuration = false;
-let currTrackPlaytime = false;
+let sessID = "";
+let submitURL = "";
+let npURL = "";
+let currTrackDuration = 0;
+let currTrackPlayTime = 0;
 let numChecks = 0;
 
 function confirmBrowseAway(oEvent: BeforeUnloadEvent) {
@@ -39,6 +33,435 @@ function confirmBrowseAway(oEvent: BeforeUnloadEvent) {
   // https://developer.mozilla.org/en-US/docs/Web/API/BeforeUnloadEvent/returnValue
   if (currentlyScrobbling !== -1)
     oEvent.returnValue = "You are currently scrobbling a record. Leaving the page now will prevent future tracks from this release from scrobbling.";
+}
+
+function getPageArtist(): string {
+  const byartist = $("span[itemprop=\"byArtist\"]");
+  const art_cred = $(byartist).find(".credited_name:eq(0) > span[itemprop=\"name\"]");
+  if ($(art_cred).length > 0) {
+    return $(art_cred).text();
+  } else {
+    return $(byartist).text();
+  }
+}
+
+function getAlbum(): string {
+  return $(".release_page meta[itemprop=\"name\"]").attr("content")?.trim() ?? "";
+}
+
+function isVariousArtists(): boolean {
+  const artist = getPageArtist();
+  return artist.indexOf("Various Artists") > -1 ||
+    artist.indexOf(" / ") > -1;
+}
+
+class ScrobbleRecord {
+  artist: string;
+  trackName: string;
+  duration: number;
+  time: number;
+
+  constructor(trackName: string, artist: string, duration: string) {
+    this.artist = artist;
+    this.trackName = trackName;
+
+    const durastr = duration.trim();
+    const colon = durastr.indexOf(":");
+    if (colon !== -1) {
+      const minutes = parseInt(durastr.substring(0, colon));
+      const seconds = parseInt(durastr.substring(colon + 1));
+      this.duration = minutes * 60 + seconds;
+    } else {
+      this.duration = 180;
+    }
+
+    this.time = 0;
+  }
+}
+
+function fetch_unix_timestamp(): number {
+  return parseInt(new Date().getTime().toString().substring(0, 10));
+}
+
+function acceptSubmitResponse(responseDetails: any, isBatch: boolean) {
+  if (responseDetails.status === 200) {
+    if (responseDetails.responseText.indexOf("OK") === -1) {
+      alertSubmitFailed(responseDetails);
+    }
+  } else {
+    alertSubmitFailed(responseDetails);
+  }
+
+  if (isBatch) {
+    const marquee = document.getElementById("scrymblemarquee");
+    if (marquee !== null) {
+      marquee.innerHTML = "Scrobbled OK!";
+    }
+  } else {
+    scrobbleNextSong();
+  }
+}
+
+function alertSubmitFailed(responseDetails: any) {
+  alert("track submit failed: " + responseDetails.status +
+    ' ' + responseDetails.statusText + '\n\n' +
+    'Data:\n' + responseDetails.responseText);
+}
+
+function acceptSubmitResponseSingle(responseDetails: any) {
+  acceptSubmitResponse(responseDetails, false);
+}
+
+function acceptSubmitResponseBatch(responseDetails: any) {
+  acceptSubmitResponse(responseDetails, true);
+}
+
+function acceptNPResponse(responseDetails: any) {
+  if (responseDetails.status === 200) {
+    if (responseDetails.responseText.indexOf("OK") == -1) {
+      alertSubmitFailed(responseDetails);
+    }
+  } else {
+    alertSubmitFailed(responseDetails);
+  }
+}
+
+function buildListOfSongsToScrobble() {
+  toScrobble = new Array();
+
+  $.each($('.scrymblechk'), function () {
+    if ($(this).is(':checked')) {
+      const song = $(this).parent().parent();
+      var songTitle = $(song).find('span[itemprop="name"]').text();
+      var artist = getPageArtist();
+      var length = $(song).find('.tracklist_duration').text();
+
+      ////
+
+      if (isVariousArtists()) {
+        var firstDash = songTitle.indexOf(" - ");
+        if (firstDash == -1) // no dash exists! must be a single artist with " / " in the name or v/a with unscrobbleable list
+        {
+          artist = getPageArtist();
+          if (artist.indexOf("Various Artists") > -1) {
+            artist = $(".album_title:eq(0)").text()
+            //canscrobble = 0;
+          }
+        }
+        else {
+          artist = songTitle.substring(0, firstDash);
+          songTitle = songTitle.substring(firstDash + 3);
+        }
+      }
+      else {
+        artist = getPageArtist()
+        const title = $(song).find('span[itemprop="name"]');
+        if ($(title).html().indexOf('<a title="[Artist') == 0 && $(title).text().indexOf(' - ') > 0) {
+          var firstDash = songTitle.indexOf(" - ");
+          artist = songTitle.substring(0, firstDash);
+          songTitle = songTitle.substring(firstDash + 3);
+        }
+      }
+
+      if ((songTitle.toLowerCase() == "untitled") || (songTitle.toLowerCase() == "untitled track") || (songTitle == "")) {
+        songTitle = "[untitled]";
+      }
+
+      ////
+      while (songTitle.indexOf('  ') > 0) { songTitle = songTitle.replace('  ', ' ') }
+      toScrobble[toScrobble.length] = new ScrobbleRecord(songTitle, artist, length);
+    }
+  });
+}
+
+function submitTracksBatch(sessID: string, submitURL: string) {
+  buildListOfSongsToScrobble();
+
+  if (toScrobble === null)
+    return;
+
+  let currTime = fetch_unix_timestamp();
+  const hoursFudgeStr = prompt("How many hours ago did you listen to this?");
+  if (hoursFudgeStr != null) {
+    const album = getAlbum();
+    const hoursFudge = parseFloat(hoursFudgeStr);
+
+    if (!isNaN(hoursFudge)) {
+      currTime = currTime - (hoursFudge * 60 * 60);
+    }
+
+    for (let i = toScrobble.length - 1; i >= 0; i--) {
+      currTime = currTime * 1 - toScrobble[i].duration * 1;
+      toScrobble[i].time = currTime;
+    }
+
+    let outstr = `Artist: ${getPageArtist()}\nAlbum: ${album}\n`;
+
+    for (let i = 0; i < toScrobble.length; i++) {
+      outstr += toScrobble[i].trackName + "(" + toScrobble[i].duration + ")\n";
+    }
+
+    const postdata = {} as IDictionary;
+
+    for (let i = 0; i < toScrobble.length; i++) {
+      postdata[`a[${i}]`] = toScrobble[i].artist;
+      postdata[`t[${i}]`] = toScrobble[i].trackName;
+      postdata[`b[${i}]`] = album;
+      postdata[`n[${i}]`] = i + 1;
+      postdata[`l[${i}]`] = toScrobble[i].duration;
+      postdata[`i[${i}]`] = toScrobble[i].time;
+      postdata[`o[${i}]`] = "P";
+      postdata[`r[${i}]`] = "";
+      postdata[`m[${i}]`] = "";
+    }
+
+    postdata["s"] = sessID;
+
+    let postdataStr = "";
+    let firstTime = true;
+    for (let currKey in postdata) {
+      if (firstTime) {
+        firstTime = false;
+      } else {
+        postdataStr = `${postdataStr}&`;
+      }
+      postdataStr = `${postdataStr}${encodeURIComponent(currKey)}=${encodeURIComponent(postdata[currKey])}`;
+    }
+
+    GM_xmlhttpRequest({
+      method: "POST",
+      url: submitURL,
+      data: postdataStr,
+      headers: {
+        "User-agent": "Mozilla/4.0 (compatible) Greasemonkey",
+        "Content-type": "application/x-www-form-urlencoded",
+      },
+      onload: acceptSubmitResponseBatch
+    });
+  }
+}
+
+function elementsOnAndOff(state: boolean) {
+  $("#scrobblenow").prop("disabled", !state);
+  $("#scrobblepassword").prop("disabled", !state);
+  $("#scrobbleusername").prop("disabled", !state);
+  $("#scrobblepassword").prop("disabled", !state);
+
+  $.each($(".scrymblechk"), function () {
+    try {
+      $(this).prop("disabled", !state);
+    } catch (e) { }
+  });
+}
+
+function elementsOff() {
+  elementsOnAndOff(false);
+}
+
+function elementsOn() {
+  elementsOnAndOff(true);
+}
+
+function startScrobble(): void {
+  currentlyScrobbling = -1;
+  currTrackDuration = 0;
+  currTrackPlayTime = 0;
+
+  elementsOff();
+  buildListOfSongsToScrobble();
+  scrobbleNextSong();
+}
+
+function resetScrobbler(): void {
+  currentlyScrobbling = -1;
+  currTrackDuration = 0;
+  currTrackPlayTime = 0;
+  setMarquee("&nbsp;");
+
+  const progbar = document.getElementById("progbar");
+  if (progbar !== null) {
+    progbar.style.width = "0%";
+  }
+
+  toScrobble = new Array();
+  elementsOn();
+  numChecks = 0;
+}
+
+function scrobbleNextSong(): void {
+  currentlyScrobbling++;
+
+  if (currentlyScrobbling === toScrobble.length) {
+    resetScrobbler();
+  } else {
+    window.setTimeout(timertick, 10);
+    handshake(false);
+  }
+}
+
+function submitThisTrack(): void {
+  const postdata = {} as IDictionary;
+  let i = 0;
+  const currTime = fetch_unix_timestamp();
+
+  postdata[`a${i}`] = toScrobble[currentlyScrobbling].artist;
+  postdata[`t${i}`] = toScrobble[currentlyScrobbling].trackName;
+  postdata[`b${i}`] = getAlbum();
+  postdata[`n${i}`] = (currentlyScrobbling + 1);
+  postdata[`l${i}`] = toScrobble[currentlyScrobbling].duration;
+  postdata[`i${i}`] = currTime - toScrobble[currentlyScrobbling].duration;
+  postdata[`o${i}`] = "P";
+  postdata[`r${i}`] = "";
+  postdata[`m${i}`] = "";
+
+  postdata["s"] = sessID;
+
+  let postdataStr = "";
+  let firstTime = true;
+  for (let currKey in postdata) {
+    if (firstTime) {
+      firstTime = false;
+    } else {
+      postdataStr = `${postdataStr}&`;
+    }
+    postdataStr = `${postdataStr}${encodeURIComponent(currKey)}=${encodeURIComponent(postdata[currKey])}`;
+  }
+
+  GM_xmlhttpRequest({
+    method: "POST",
+    url: submitURL,
+    data: postdataStr,
+    headers: {
+      "User-agent": "Mozilla/4.0 (compatible) Greasemonkey",
+      "Content-type": "application/x-www-form-urlencoded"
+    },
+    onload: acceptSubmitResponseSingle
+  });
+}
+
+interface IDictionary {
+  [index: string]: any;
+}
+
+function npNextTrack() {
+  const postdata = {} as IDictionary;
+  let i = 0;
+  const currTime = fetch_unix_timestamp();
+
+  postdata["a"] = toScrobble[currentlyScrobbling].artist;
+  postdata["t"] = toScrobble[currentlyScrobbling].trackName;
+  postdata["b"] = getAlbum();
+  postdata["n"] = currentlyScrobbling + 1;
+  postdata["l"] = toScrobble[currentlyScrobbling].duration;
+  postdata["m"] = "";
+  postdata["s"] = sessID;
+
+  currTrackDuration = toScrobble[currentlyScrobbling].duration;
+  currTrackPlayTime = 0;
+
+  setMarquee("toScrobble[currentlyScrobbling].trackName");
+
+  let postdataStr = "";
+  let firstTime = true;
+  for (let currKey in postdata) {
+    if (firstTime) {
+      firstTime = false;
+    } else {
+      postdataStr = postdataStr + "&";
+    }
+    postdataStr = postdataStr + encodeURIComponent(currKey) + "=" + encodeURIComponent(postdata[currKey]);
+  }
+
+  GM_xmlhttpRequest({
+    method: 'POST',
+    url: npURL,
+    data: postdataStr,
+    headers: {
+      'User-agent': 'Mozilla/4.0 (compatible) Greasemonkey',
+      'Content-type': 'application/x-www-form-urlencoded'
+    },
+    onload: acceptNPResponse
+  });
+}
+
+function timertick() {
+  let again = true;
+  if (currentlyScrobbling !== -1) {
+    const progbar = document.getElementById("progbar");
+    if (progbar !== null && currTrackDuration !== 0) {
+      progbar.style.width = `${100 * currTrackPlayTime / currTrackDuration}%`;
+    }
+
+    currTrackPlayTime++;
+
+    if (currTrackPlayTime === currTrackDuration) {
+      submitThisTrack();
+      again = false;
+    }
+
+  }
+  if (again) {
+    window.setTimeout(timertick, 1000);
+  }
+}
+
+function acceptHandshakeSingle(responseDetails: any) {
+  acceptHandshake(responseDetails, false);
+}
+
+function acceptHandshakeBatch(responseDetails: any) {
+  acceptHandshake(responseDetails, true);
+}
+
+function acceptHandshake(responseDetails: any, isBatch: boolean) {
+  if (responseDetails.status === 200) {
+    const lines = responseDetails.responseText.split("\n");
+    if (lines[0].indexOf("OK") === -1) {
+      alertHandshakeFailed(responseDetails);
+    } else {
+      sessID = lines[1];
+      npURL = lines[2];
+      submitURL = lines[3];
+
+      if (isBatch) {
+        submitTracksBatch(sessID, submitURL);
+      } else {
+        npNextTrack();
+      }
+    }
+  } else {
+    alertHandshakeFailed(responseDetails);
+  }
+}
+
+function alertHandshakeFailed(responseDetails: any) {
+  alert(`Handshake failed: ${responseDetails.status} ${responseDetails.statusText}\n\nData:\n${responseDetails.responseText}`);
+}
+
+function handshake(isBatch: boolean) {
+  const user = $("#scrobbleusername").val() ?? "";
+  const password = $("#scrobblepassword").val()?.toString() ?? "";
+  GM_setValue("user", user);
+  GM_setValue("pass", password);
+
+  const timestamp = fetch_unix_timestamp();
+  const auth = hex_md5(`${hex_md5(password)}${timestamp}`);
+
+  const handshakeURL = `http://post.audioscrobbler.com/?hs=true&p=1.2&c=scr&v=1.0&u=${user}&t=${timestamp}&a=${auth}`;
+
+  GM_xmlhttpRequest({
+    method: "GET",
+    url: handshakeURL,
+    headers: {
+      "User-agent": "Mozilla/4.0 (compatible) Greasemonkey"
+    },
+    onload: isBatch ? acceptHandshakeBatch : acceptHandshakeSingle
+  });
+
+}
+
+function handshakeBatch(): void {
+  handshake(true);
 }
 
 (function () {
@@ -77,8 +500,14 @@ function allOrNoneClick(): void {
 }
 
 function allOrNoneAction() {
-  var allnone = $("#allornone").is(":checked");
   $.each($(".scrymblechk"), function () {
-    $(this).prop("checked", allnone);
+    $(this).prop("checked", $("#allornone").is(":checked"));
   });
+}
+
+function setMarquee(value: string) {
+  const marquee = document.getElementById("scrymblemarquee");
+  if (marquee !== null) {
+    marquee.innerHTML = value;
+  }
 }
