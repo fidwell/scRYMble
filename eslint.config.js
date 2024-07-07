@@ -26,9 +26,9 @@ export default [
       "quotes": ["error", "double"],
       "@typescript-eslint/no-explicit-any": "off",
       "eqeqeq": ["error"],
-      "@stylistic/ts/semi": [ "error", "always" ],
-      "@stylistic/ts/brace-style": [ "error" ],
-      "@stylistic/ts/no-extra-parens": [ "error" ],
+      "@stylistic/ts/semi": ["error", "always"],
+      "@stylistic/ts/brace-style": ["error"],
+      "@stylistic/ts/no-extra-parens": ["error"],
       "@stylistic/ts/indent": ["error", 2],
       "@stylistic/js/no-trailing-spaces": ["error"]
     }
