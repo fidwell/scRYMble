@@ -1,5 +1,5 @@
+import { HttpResponse } from "./models/HttpResponse";
 import { IDictionary } from "./models/IDictionary";
-import { ResponseDetails } from "./models/ResponseDetails";
 import ScrobbleRecord from "./models/ScrobbleRecord";
 import * as httpRequestHelper from "./services/httpRequestHelper";
 import { handshake } from "./services/lastfm";
@@ -44,9 +44,9 @@ function isVariousArtists(): boolean {
     artist.indexOf(" / ") > -1;
 }
 
-function acceptSubmitResponse(responseDetails: ResponseDetails, isBatch: boolean) {
+function acceptSubmitResponse(responseDetails: HttpResponse, isBatch: boolean) {
   if (responseDetails.status === 200) {
-    if (responseDetails.responseText.indexOf("OK") === -1) {
+    if (!responseDetails.isOkStatus) {
       alertSubmitFailed(responseDetails);
     }
   } else {
@@ -63,21 +63,21 @@ function acceptSubmitResponse(responseDetails: ResponseDetails, isBatch: boolean
   }
 }
 
-function alertSubmitFailed(responseDetails: ResponseDetails) {
+function alertSubmitFailed(responseDetails: HttpResponse) {
   alert(`Track submit failed: ${responseDetails.status} ${responseDetails.statusText}\n\nData:\n${responseDetails.responseText}`);
 }
 
-function acceptSubmitResponseSingle(responseDetails: ResponseDetails) {
+function acceptSubmitResponseSingle(responseDetails: HttpResponse) {
   acceptSubmitResponse(responseDetails, false);
 }
 
-function acceptSubmitResponseBatch(responseDetails: ResponseDetails) {
+function acceptSubmitResponseBatch(responseDetails: HttpResponse) {
   acceptSubmitResponse(responseDetails, true);
 }
 
-function acceptNPResponse(responseDetails: ResponseDetails) {
+function acceptNPResponse(responseDetails: HttpResponse) {
   if (responseDetails.status === 200) {
-    if (responseDetails.responseText.indexOf("OK") === -1) {
+    if (!responseDetails.isOkStatus) {
       alertSubmitFailed(responseDetails);
     }
   } else {
@@ -185,16 +185,7 @@ function submitTracksBatch(sessID: string, submitURL: string) {
       postdataStr = `${postdataStr}${encodeURIComponent(currKey)}=${encodeURIComponent(postdata[currKey])}`;
     }
 
-    GM_xmlhttpRequest({
-      method: "POST",
-      url: submitURL,
-      data: postdataStr,
-      headers: {
-        "User-agent": "Mozilla/4.0 (compatible) Greasemonkey",
-        "Content-type": "application/x-www-form-urlencoded",
-      },
-      onload: acceptSubmitResponseBatch
-    });
+    httpRequestHelper.httpPost(submitURL, postdataStr, acceptSubmitResponseBatch);
   }
 }
 
@@ -333,23 +324,22 @@ function timertick() {
   }
 }
 
-function acceptHandshakeSingle(responseDetails: ResponseDetails) {
+function acceptHandshakeSingle(responseDetails: HttpResponse) {
   acceptHandshake(responseDetails, false);
 }
 
-function acceptHandshakeBatch(responseDetails: ResponseDetails) {
+function acceptHandshakeBatch(responseDetails: HttpResponse) {
   acceptHandshake(responseDetails, true);
 }
 
-function acceptHandshake(responseDetails: ResponseDetails, isBatch: boolean) {
+function acceptHandshake(responseDetails: HttpResponse, isBatch: boolean) {
   if (responseDetails.status === 200) {
-    const lines = responseDetails.responseText.split("\n");
-    if (lines[0].indexOf("OK") === -1) {
+    if (!responseDetails.isOkStatus) {
       alertHandshakeFailed(responseDetails);
     } else {
-      sessID = lines[1];
-      npURL = lines[2];
-      submitURL = lines[3];
+      sessID = responseDetails.sessionId;
+      npURL = responseDetails.nowPlayingUrl;
+      submitURL = responseDetails.submitUrl;
 
       if (isBatch) {
         submitTracksBatch(sessID, submitURL);
@@ -362,7 +352,7 @@ function acceptHandshake(responseDetails: ResponseDetails, isBatch: boolean) {
   }
 }
 
-function alertHandshakeFailed(responseDetails: ResponseDetails) {
+function alertHandshakeFailed(responseDetails: HttpResponse) {
   alert(`Handshake failed: ${responseDetails.status} ${responseDetails.statusText}\n\nData:\n${responseDetails.responseText}`);
 }
 

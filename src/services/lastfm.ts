@@ -1,8 +1,8 @@
-import { ResponseDetails } from "../models/ResponseDetails";
+import { HttpResponse } from "../models/HttpResponse";
 import { httpGet } from "./httpRequestHelper";
 import { fetch_unix_timestamp } from "./utilities";
 
-export function handshake(callback: (response: ResponseDetails) => void) {
+export function handshake(callback: (response: HttpResponse) => void) {
   const user = $("#scrobbleusername").val()?.toString() ?? "";
   const password = $("#scrobblepassword").val()?.toString() ?? "";
   GM_setValue("user", user);

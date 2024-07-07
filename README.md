@@ -16,7 +16,7 @@ Visit any release page on RateYourMusic (`https://rateyourmusic.com/release/*`) 
 
 ![image](https://github.com/fidwell/scRYMble/assets/5436387/c9331226-ed27-4e23-acde-9ec836f4195f)
 
-Fill your last.fm username and password. You can also check and uncheck tracks you wish to scrobble or ignore.
+Fill in your last.fm username and password. You can also check and uncheck tracks you wish to scrobble or ignore.
 
 ### Scrobble in real time
 
