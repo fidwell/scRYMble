@@ -71,4 +71,27 @@ export default class scRYMbleUi {
       $(this).prop("checked", $("#allornone").is(":checked"));
     });
   }
+
+  elementsOnAndOff(state: boolean): void {
+    $("#scrobblenow").prop("disabled", !state);
+    $("#scrobblepassword").prop("disabled", !state);
+    $("#scrobbleusername").prop("disabled", !state);
+    $("#scrobblepassword").prop("disabled", !state);
+
+    $.each($(".scrymblechk"), function () {
+      try {
+        $(this).prop("disabled", !state);
+      } catch (e) {
+        console.log(e);
+      }
+    });
+  }
+
+  elementsOff(): void {
+    this.elementsOnAndOff(false);
+  }
+
+  elementsOn(): void {
+    this.elementsOnAndOff(true);
+  }
 }

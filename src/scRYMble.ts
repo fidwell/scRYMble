@@ -54,10 +54,7 @@ function acceptSubmitResponse(responseDetails: HttpResponse, isBatch: boolean) {
   }
 
   if (isBatch) {
-    const marquee = document.getElementById("scrymblemarquee");
-    if (marquee !== null) {
-      marquee.innerHTML = "Scrobbled OK!";
-    }
+    ui.setMarquee("Scrobbled OK!");
   } else {
     scrobbleNextSong();
   }
@@ -189,35 +186,12 @@ function submitTracksBatch(sessID: string, submitURL: string) {
   }
 }
 
-function elementsOnAndOff(state: boolean) {
-  $("#scrobblenow").prop("disabled", !state);
-  $("#scrobblepassword").prop("disabled", !state);
-  $("#scrobbleusername").prop("disabled", !state);
-  $("#scrobblepassword").prop("disabled", !state);
-
-  $.each($(".scrymblechk"), function () {
-    try {
-      $(this).prop("disabled", !state);
-    } catch (e) {
-      console.log(e);
-    }
-  });
-}
-
-function elementsOff() {
-  elementsOnAndOff(false);
-}
-
-function elementsOn() {
-  elementsOnAndOff(true);
-}
-
 function startScrobble(): void {
   currentlyScrobbling = -1;
   currTrackDuration = 0;
   currTrackPlayTime = 0;
 
-  elementsOff();
+  ui.elementsOff();
   buildListOfSongsToScrobble();
   scrobbleNextSong();
 }
@@ -229,7 +203,7 @@ function resetScrobbler(): void {
   ui.setMarquee("&nbsp;");
   ui.setProgressBar(0);
   toScrobble = [];
-  elementsOn();
+  ui.elementsOn();
 }
 
 function scrobbleNextSong(): void {
@@ -287,7 +261,7 @@ function npNextTrack() {
   currTrackDuration = toScrobble[currentlyScrobbling].duration;
   currTrackPlayTime = 0;
 
-  ui.setMarquee("toScrobble[currentlyScrobbling].trackName");
+  ui.setMarquee(toScrobble[currentlyScrobbling].trackName);
 
   let postdataStr = "";
   let firstTime = true;
