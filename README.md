@@ -8,7 +8,7 @@ scRYMble is a userscript for web browsers that allows you to scrobble songs to [
 
 I recommend using the [Violentmonkey](https://violentmonkey.github.io/) extension for user script management.
 
-_To do: Add link to GreasyFork when it's available._
+Download the script from GreasyFork: [https://greasyfork.org/en/scripts/500052-scrymble](https://greasyfork.org/en/scripts/500052-scrymble) and install it to your browser extension.
 
 ## Usage
 
@@ -33,7 +33,7 @@ scRYMble was created by [bluetshirt](https://rateyourmusic.com/~bluetshirt) in 2
 ### Credits
 
 - Original author: bluetshirt
-- Name: lynkali 
+- Name: lynkali
 - Useful tweaks and bug fixes: fidwell, AnniesBoobs, BruceWayne, actually, Kronz, Carcinogeneration
 
 ## For developers: How to build

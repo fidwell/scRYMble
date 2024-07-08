@@ -1,5 +1,6 @@
 export const scRYMbleBanner = `// ==UserScript==
 // @name         scRYMble
+// @license      MIT
 // @version      __buildDate__
 // @description  Visit a release page on rateyourmusic.com and scrobble the songs you see!
 // @author       fidwell
