@@ -12,4 +12,6 @@ export const scRYMbleBanner = `// ==UserScript==
 // @grant        GM_xmlhttpRequest
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js
 // @require      https://update.greasyfork.org/scripts/130/10066/Portable%20MD5%20Function.js
+// @updateURL    https://greasyfork.org/en/scripts/500052-scrymble
+// @downloadURL  https://greasyfork.org/en/scripts/500052-scrymble
 // ==/UserScript==`;
