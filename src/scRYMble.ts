@@ -213,7 +213,7 @@ function scrobbleNextSong(): void {
     resetScrobbler();
   } else {
     window.setTimeout(timertick, 10);
-    handshake(acceptHandshakeSingle);
+    handshake(ui, acceptHandshakeSingle);
   }
 }
 
@@ -331,7 +331,7 @@ function alertHandshakeFailed(responseDetails: HttpResponse) {
 }
 
 function handshakeBatch(): void {
-  handshake(acceptHandshakeBatch);
+  handshake(ui, acceptHandshakeBatch);
 }
 
 (function () {

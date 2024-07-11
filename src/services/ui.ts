@@ -18,8 +18,7 @@ export default class scRYMbleUi {
   private passwordId = "scrobblepassword";
 
   constructor() {
-    const trackListElement = document.getElementById(this.trackElementId);
-    if (trackListElement === null || trackListElement.children.length === 0) {
+    if ((this.trackListDiv?.children.length ?? 0) === 0) {
       console.log("scRYMble: No track list found.");
     } else {
       this.enabled = true;
@@ -30,6 +29,14 @@ export default class scRYMbleUi {
 
   get isEnabled(): boolean {
     return this.enabled;
+  }
+
+  get username(): string {
+    return this.usernameInput.value;
+  }
+
+  get password(): string {
+    return this.passwordInput.value;
   }
 
   createCheckboxes(): void {
@@ -75,32 +82,25 @@ export default class scRYMbleUi {
   </table>`;
     eleButtonDiv.style.textAlign = "right";
 
-    document.getElementById(this.trackElementId)?.after(eleButtonDiv);
-
-    const eleAllOrNone = document.getElementById(this.selectAllOrNoneId);
-    eleAllOrNone?.addEventListener("click", () => this.allOrNoneClick(), true);
+    this.trackListDiv?.after(eleButtonDiv);
+    this.allOrNoneCheckbox.addEventListener("click", () => this.allOrNoneClick(), true);
   }
 
   hookUpScrobbleNow(startScrobble: () => void): void {
-    const eleScrobbleNow = document.getElementById(this.scrobbleNowId);
-    eleScrobbleNow?.addEventListener("click", startScrobble, true);
+    this.scrobbleNowButton.addEventListener("click", startScrobble, true);
   }
 
   hookUpScrobbleThen(handshakeBatch: () => void): void {
-    document.getElementById(this.scrobbleThenId)?.addEventListener("click", handshakeBatch, true);
+    this.scrobbleThenButton.addEventListener("click", handshakeBatch, true);
   }
 
   setMarquee(value: string): void {
-    const marquee = document.getElementById(this.marqueeId);
-    if (marquee !== null) {
-      marquee.innerHTML = value;
-    }
+    this.marquee.innerHTML = value;
   }
 
   setProgressBar(percentage: number): void {
-    const progbar = document.getElementById(this.progBarId);
-    if (progbar !== null && percentage >= 0 && percentage <= 100) {
-      progbar.style.width = `${percentage}%`;
+    if (percentage >= 0 && percentage <= 100) {
+      this.progressBar.style.width = `${percentage}%`;
     }
   }
 
@@ -109,16 +109,22 @@ export default class scRYMbleUi {
   }
 
   allOrNoneAction(): void {
-    const selectAllOrNoneId = this.selectAllOrNoneId; // todo - refactor after getting rid of jQuery
+    const shouldCheck = this.allOrNoneCheckbox.checked;
     $.each($(`.${this.checkboxClass}`), function () {
-      $(this).prop("checked", $(`#${selectAllOrNoneId}`).is(":checked"));
+      $(this).prop("checked", shouldCheck);
     });
   }
 
   elementsOnAndOff(state: boolean): void {
-    $(`#${this.scrobbleNowId}`).prop("disabled", !state);
-    $(`#${this.usernameId}`).prop("disabled", !state);
-    $(`#${this.passwordId}`).prop("disabled", !state);
+    if (state) {
+      this.scrobbleNowButton.removeAttribute("disabled");
+      this.usernameInput.removeAttribute("disabled");
+      this.passwordInput.removeAttribute("disabled");
+    } else {
+      this.scrobbleNowButton.setAttribute("disabled", "disabled");
+      this.usernameInput.setAttribute("disabled", "disabled");
+      this.passwordInput.setAttribute("disabled", "disabled");
+    }
 
     $.each($(`.${this.checkboxClass}`), function () {
       try {
@@ -136,4 +142,38 @@ export default class scRYMbleUi {
   elementsOn(): void {
     this.elementsOnAndOff(true);
   }
+
+  //#region Element getters
+  private get trackListDiv(): HTMLDivElement {
+    return document.getElementById(this.trackElementId) as HTMLDivElement;
+  }
+
+  private get allOrNoneCheckbox(): HTMLInputElement {
+    return document.getElementById(this.selectAllOrNoneId) as HTMLInputElement;
+  }
+
+  private get scrobbleNowButton(): HTMLButtonElement {
+    return document.getElementById(this.scrobbleNowId) as HTMLButtonElement;
+  }
+
+  private get scrobbleThenButton(): HTMLButtonElement {
+    return document.getElementById(this.scrobbleThenId) as HTMLButtonElement;
+  }
+
+  private get marquee(): HTMLMarqueeElement {
+    return document.getElementById(this.marqueeId) as HTMLMarqueeElement;
+  }
+
+  private get progressBar(): HTMLDivElement {
+    return document.getElementById(this.progBarId) as HTMLDivElement;
+  }
+
+  private get usernameInput(): HTMLInputElement {
+    return document.getElementById(this.usernameId) as HTMLInputElement;
+  }
+
+  private get passwordInput(): HTMLInputElement {
+    return document.getElementById(this.passwordId) as HTMLInputElement;
+  }
+  //#endregion
 }
