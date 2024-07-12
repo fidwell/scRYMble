@@ -3,7 +3,6 @@ export default class scRYMbleUi {
 
   // RYM elements
   private trackElementId = "tracks";
-  private trackClass = "track";
   private tracklistLineClass = "tracklist_line";
   private tracklistNumClass = "tracklist_num";
 
@@ -40,15 +39,16 @@ export default class scRYMbleUi {
   }
 
   createCheckboxes(): void {
-    let n = 0;
-    const chkbox = `<span style="float: left;"><input type="checkbox" class="${this.checkboxClass}" id="chktrack__NUM__" checked="checked"></span>`;
-    const tracklistNumClass = this.tracklistNumClass; // todo - refactor after getting rid of jQuery
-    $.each($(`#${this.trackElementId} > .${this.trackClass} > .${this.tracklistLineClass}`), function () {
-      if ($(this).find(`.${tracklistNumClass}:eq(0)`).text() !== "\n                     \n                  ") {
-        n++;
-        $(this).prepend(chkbox.replace("__NUM__", `${n}`));
+    const checkboxTemplate = `<input type="checkbox" class="${this.checkboxClass}" checked="checked">`;
+    const tracklistLines = document.getElementById(this.trackElementId)?.getElementsByClassName(this.tracklistLineClass) ?? [];
+    for (const tracklistLine of tracklistLines) {
+      if (tracklistLine.getElementsByClassName(this.tracklistNumClass)[0].innerHTML.trim().length > 0) {
+        const thisCheckboxElement = document.createElement("span");
+        thisCheckboxElement.style.float = "left";
+        thisCheckboxElement.innerHTML = checkboxTemplate;
+        tracklistLine.prepend(thisCheckboxElement);
       }
-    });
+    }
   }
 
   createControls(): void {
