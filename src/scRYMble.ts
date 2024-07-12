@@ -73,6 +73,7 @@ function acceptNPResponse(responseDetails: HttpResponse) {
 function buildListOfSongsToScrobble() {
   toScrobble = [];
 
+  // TODO - Remove jQuery
   $.each($(".scrymblechk"), function () {
     if ($(this).is(":checked")) {
       const song = $(this).parent().parent();
@@ -157,17 +158,9 @@ function submitTracksBatch(sessID: string, submitURL: string) {
 
     postdata["s"] = sessID;
 
-    let postdataStr = "";
-    let firstTime = true;
-    for (const currKey in postdata) {
-      if (firstTime) {
-        firstTime = false;
-      } else {
-        postdataStr = `${postdataStr}&`;
-      }
-      postdataStr = `${postdataStr}${encodeURIComponent(currKey)}=${encodeURIComponent(postdata[currKey])}`;
-    }
-
+    const postdataStr = Object.entries(postdata)
+      .map(([key, value]) => `${key}=${value}`)
+      .join("&");
     httpRequestHelper.httpPost(submitURL, postdataStr, acceptSubmitResponseBatch);
   }
 }
@@ -220,6 +213,7 @@ function submitThisTrack(): void {
 
   postdata["s"] = sessID;
 
+  // TODO - Refactor string generation
   let postdataStr = "";
   let firstTime = true;
   for (const currKey in postdata) {
@@ -249,6 +243,7 @@ function npNextTrack() {
 
   _scRYMbleUi.setMarquee(toScrobble[currentlyScrobbling].trackName);
 
+  // TODO - Refactor string generation
   let postdataStr = "";
   let firstTime = true;
   for (const currKey in postdata) {
