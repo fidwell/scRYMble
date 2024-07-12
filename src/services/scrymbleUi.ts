@@ -1,12 +1,9 @@
+import rymUi from "./rymUi";
+
 export default class scRYMbleUi {
   private enabled = false;
+  private _rymUi: rymUi;
 
-  // RYM elements
-  private trackElementId = "tracks";
-  private tracklistLineClass = "tracklist_line";
-  private tracklistNumClass = "tracklist_num";
-
-  // scRYMble elements
   private marqueeId = "scrymblemarquee";
   private progBarId = "progbar";
   private scrobbleNowId = "scrobblenow";
@@ -16,8 +13,9 @@ export default class scRYMbleUi {
   private usernameId = "scrobbleusername";
   private passwordId = "scrobblepassword";
 
-  constructor() {
-    if ((this.trackListDiv?.children.length ?? 0) === 0) {
+  constructor(rymUi: rymUi) {
+    this._rymUi = rymUi;
+    if ((this._rymUi.trackListDiv?.children.length ?? 0) === 0) {
       console.log("scRYMble: No track list found.");
     } else {
       this.enabled = true;
@@ -40,9 +38,8 @@ export default class scRYMbleUi {
 
   createCheckboxes(): void {
     const checkboxTemplate = `<input type="checkbox" class="${this.checkboxClass}" checked="checked">`;
-    const tracklistLines = document.getElementById(this.trackElementId)?.getElementsByClassName(this.tracklistLineClass) ?? [];
-    for (const tracklistLine of tracklistLines) {
-      if (tracklistLine.getElementsByClassName(this.tracklistNumClass)[0].innerHTML.trim().length > 0) {
+    for (const tracklistLine of this._rymUi.tracklistLines) {
+      if (this._rymUi.hasTrackNumber(tracklistLine)) {
         const thisCheckboxElement = document.createElement("span");
         thisCheckboxElement.style.float = "left";
         thisCheckboxElement.innerHTML = checkboxTemplate;
@@ -82,7 +79,7 @@ export default class scRYMbleUi {
   </table>`;
     eleButtonDiv.style.textAlign = "right";
 
-    this.trackListDiv?.after(eleButtonDiv);
+    this._rymUi.trackListDiv?.after(eleButtonDiv);
     this.allOrNoneCheckbox.addEventListener("click", () => this.allOrNoneClick(), true);
   }
 
@@ -143,10 +140,6 @@ export default class scRYMbleUi {
   }
 
   //#region Element getters
-  private get trackListDiv(): HTMLDivElement {
-    return document.getElementById(this.trackElementId) as HTMLDivElement;
-  }
-
   private get allOrNoneCheckbox(): HTMLInputElement {
     return document.getElementById(this.selectAllOrNoneId) as HTMLInputElement;
   }

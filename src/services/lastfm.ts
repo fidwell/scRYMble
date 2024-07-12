@@ -1,6 +1,6 @@
 import { HttpResponse } from "../models/HttpResponse";
 import { httpGet } from "./httpRequestHelper";
-import scRYMbleUi from "./ui";
+import scRYMbleUi from "./scrymbleUi";
 import { fetch_unix_timestamp } from "./utilities";
 
 export function handshake(ui: scRYMbleUi, callback: (response: HttpResponse) => void) {

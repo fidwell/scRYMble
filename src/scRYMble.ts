@@ -3,10 +3,12 @@ import { IDictionary } from "./models/IDictionary";
 import ScrobbleRecord from "./models/ScrobbleRecord";
 import * as httpRequestHelper from "./services/httpRequestHelper";
 import { handshake } from "./services/lastfm";
-import scRYMbleUi from "./services/ui";
+import rymUi from "./services/rymUi";
+import scRYMbleUi from "./services/scrymbleUi";
 import { fetch_unix_timestamp } from "./services/utilities";
 
-const ui = new scRYMbleUi();
+const _rymUi = new rymUi();
+const _scRYMbleUi = new scRYMbleUi(_rymUi);
 
 let toScrobble: ScrobbleRecord[] = [];
 let currentlyScrobbling = -1;
@@ -24,22 +26,8 @@ function confirmBrowseAway(oEvent: BeforeUnloadEvent): string {
   return "";
 }
 
-function getPageArtist(): string {
-  const byartist = $("span[itemprop=\"byArtist\"]");
-  const art_cred = $(byartist).find(".credited_name:eq(0) > span[itemprop=\"name\"]");
-  if ($(art_cred).length > 0) {
-    return $(art_cred).text();
-  } else {
-    return $(byartist).text();
-  }
-}
-
-function getAlbum(): string {
-  return $(".release_page meta[itemprop=\"name\"]").attr("content")?.trim() ?? "";
-}
-
 function isVariousArtists(): boolean {
-  const artist = getPageArtist();
+  const artist: string = _rymUi.pageArtist;
   return artist.indexOf("Various Artists") > -1 ||
     artist.indexOf(" / ") > -1;
 }
@@ -54,7 +42,7 @@ function acceptSubmitResponse(responseDetails: HttpResponse, isBatch: boolean) {
   }
 
   if (isBatch) {
-    ui.setMarquee("Scrobbled OK!");
+    _scRYMbleUi.setMarquee("Scrobbled OK!");
   } else {
     scrobbleNextSong();
   }
@@ -89,14 +77,13 @@ function buildListOfSongsToScrobble() {
     if ($(this).is(":checked")) {
       const song = $(this).parent().parent();
       let songTitle = $(song).find("span[itemprop=\"name\"]").text();
-      let artist = getPageArtist();
+      let artist: string = _rymUi.pageArtist;
       const length = $(song).find(".tracklist_duration").text();
 
       if (isVariousArtists()) {
         const firstDash = songTitle.indexOf(" - ");
         if (firstDash === -1) {
           // no dash exists! must be a single artist with " / " in the name or v/a with unscrobbleable list
-          artist = getPageArtist();
           if (artist.indexOf("Various Artists") > -1) {
             artist = $(".album_title:eq(0)").text();
           }
@@ -105,7 +92,6 @@ function buildListOfSongsToScrobble() {
           songTitle = songTitle.substring(firstDash + 3);
         }
       } else {
-        artist = getPageArtist();
         const title = $(song).find("span[itemprop=\"name\"]");
         if ($(title).html().indexOf("<a title=\"[Artist") === 0 && $(title).text().indexOf(" - ") > 0) {
           const firstDash = songTitle.indexOf(" - ");
@@ -137,7 +123,7 @@ function submitTracksBatch(sessID: string, submitURL: string) {
   let currTime = fetch_unix_timestamp();
   const hoursFudgeStr = prompt("How many hours ago did you listen to this?");
   if (hoursFudgeStr !== null) {
-    const album = getAlbum();
+    const album = _rymUi.pageAlbum;
     const hoursFudge = parseFloat(hoursFudgeStr);
 
     if (!isNaN(hoursFudge)) {
@@ -149,7 +135,7 @@ function submitTracksBatch(sessID: string, submitURL: string) {
       toScrobble[i].time = currTime;
     }
 
-    let outstr = `Artist: ${getPageArtist()}\nAlbum: ${album}\n`;
+    let outstr = `Artist: ${_rymUi.pageArtist}\nAlbum: ${album}\n`;
 
     for (const song of toScrobble) {
       outstr = `${outstr}${song.trackName} (${song.duration})\n`;
@@ -191,7 +177,7 @@ function startScrobble(): void {
   currTrackDuration = 0;
   currTrackPlayTime = 0;
 
-  ui.elementsOff();
+  _scRYMbleUi.elementsOff();
   buildListOfSongsToScrobble();
   scrobbleNextSong();
 }
@@ -200,10 +186,10 @@ function resetScrobbler(): void {
   currentlyScrobbling = -1;
   currTrackDuration = 0;
   currTrackPlayTime = 0;
-  ui.setMarquee("&nbsp;");
-  ui.setProgressBar(0);
+  _scRYMbleUi.setMarquee("&nbsp;");
+  _scRYMbleUi.setProgressBar(0);
   toScrobble = [];
-  ui.elementsOn();
+  _scRYMbleUi.elementsOn();
 }
 
 function scrobbleNextSong(): void {
@@ -213,7 +199,7 @@ function scrobbleNextSong(): void {
     resetScrobbler();
   } else {
     window.setTimeout(timertick, 10);
-    handshake(ui, acceptHandshakeSingle);
+    handshake(_scRYMbleUi, acceptHandshakeSingle);
   }
 }
 
@@ -224,7 +210,7 @@ function submitThisTrack(): void {
 
   postdata[`a${i}`] = toScrobble[currentlyScrobbling].artist;
   postdata[`t${i}`] = toScrobble[currentlyScrobbling].trackName;
-  postdata[`b${i}`] = getAlbum();
+  postdata[`b${i}`] = _rymUi.pageAlbum;
   postdata[`n${i}`] = `${currentlyScrobbling + 1}`;
   postdata[`l${i}`] = `${toScrobble[currentlyScrobbling].duration}`;
   postdata[`i${i}`] = `${currTime - toScrobble[currentlyScrobbling].duration}`;
@@ -252,7 +238,7 @@ function npNextTrack() {
   const postdata = {} as IDictionary;
   postdata["a"] = toScrobble[currentlyScrobbling].artist;
   postdata["t"] = toScrobble[currentlyScrobbling].trackName;
-  postdata["b"] = getAlbum();
+  postdata["b"] = _rymUi.pageAlbum;
   postdata["n"] = `${currentlyScrobbling + 1}`;
   postdata["l"] = `${toScrobble[currentlyScrobbling].duration}`;
   postdata["m"] = "";
@@ -261,7 +247,7 @@ function npNextTrack() {
   currTrackDuration = toScrobble[currentlyScrobbling].duration;
   currTrackPlayTime = 0;
 
-  ui.setMarquee(toScrobble[currentlyScrobbling].trackName);
+  _scRYMbleUi.setMarquee(toScrobble[currentlyScrobbling].trackName);
 
   let postdataStr = "";
   let firstTime = true;
@@ -281,7 +267,7 @@ function timertick() {
   let again = true;
   if (currentlyScrobbling !== -1) {
     if (currTrackDuration !== 0) {
-      ui.setProgressBar(100 * currTrackPlayTime / currTrackDuration);
+      _scRYMbleUi.setProgressBar(100 * currTrackPlayTime / currTrackDuration);
     }
 
     currTrackPlayTime++;
@@ -331,15 +317,15 @@ function alertHandshakeFailed(responseDetails: HttpResponse) {
 }
 
 function handshakeBatch(): void {
-  handshake(ui, acceptHandshakeBatch);
+  handshake(_scRYMbleUi, acceptHandshakeBatch);
 }
 
 (function () {
-  if (!ui.isEnabled) {
+  if (!_scRYMbleUi.isEnabled) {
     return;
   }
 
-  ui.hookUpScrobbleNow(startScrobble);
-  ui.hookUpScrobbleThen(handshakeBatch);
+  _scRYMbleUi.hookUpScrobbleNow(startScrobble);
+  _scRYMbleUi.hookUpScrobbleThen(handshakeBatch);
   window.addEventListener("beforeunload", confirmBrowseAway, true);
 })();
