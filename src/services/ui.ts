@@ -109,10 +109,9 @@ export default class scRYMbleUi {
   }
 
   allOrNoneAction(): void {
-    const shouldCheck = this.allOrNoneCheckbox.checked;
-    $.each($(`.${this.checkboxClass}`), function () {
-      $(this).prop("checked", shouldCheck);
-    });
+    for (const checkbox of this.checkboxes) {
+      (checkbox as HTMLInputElement).checked = this.allOrNoneCheckbox.checked;
+    }
   }
 
   elementsOnAndOff(state: boolean): void {
@@ -126,13 +125,13 @@ export default class scRYMbleUi {
       this.passwordInput.setAttribute("disabled", "disabled");
     }
 
-    $.each($(`.${this.checkboxClass}`), function () {
-      try {
-        $(this).prop("disabled", !state);
-      } catch (e) {
-        console.log(e);
+    for (const checkbox of this.checkboxes) {
+      if (state) {
+        checkbox.removeAttribute("disabled");
+      } else {
+        checkbox.setAttribute("disabled", "disabled");
       }
-    });
+    }
   }
 
   elementsOff(): void {
@@ -174,6 +173,10 @@ export default class scRYMbleUi {
 
   private get passwordInput(): HTMLInputElement {
     return document.getElementById(this.passwordId) as HTMLInputElement;
+  }
+
+  private get checkboxes(): HTMLCollectionOf<Element> {
+    return document.getElementsByClassName(this.checkboxClass);
   }
   //#endregion
 }
