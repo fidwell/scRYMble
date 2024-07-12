@@ -159,7 +159,7 @@ function submitTracksBatch(sessID: string, submitURL: string) {
     postdata["s"] = sessID;
 
     const postdataStr = Object.entries(postdata)
-      .map(([key, value]) => `${key}=${value}`)
+      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
       .join("&");
     httpRequestHelper.httpPost(submitURL, postdataStr, acceptSubmitResponseBatch);
   }
@@ -213,18 +213,9 @@ function submitThisTrack(): void {
 
   postdata["s"] = sessID;
 
-  // TODO - Refactor string generation
-  let postdataStr = "";
-  let firstTime = true;
-  for (const currKey in postdata) {
-    if (firstTime) {
-      firstTime = false;
-    } else {
-      postdataStr = `${postdataStr}&`;
-    }
-    postdataStr = `${postdataStr}${encodeURIComponent(currKey)}=${encodeURIComponent(postdata[currKey])}`;
-  }
-
+  const postdataStr = Object.entries(postdata)
+    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+    .join("&");
   httpRequestHelper.httpPost(submitURL, postdataStr, acceptSubmitResponseSingle);
 }
 
@@ -243,18 +234,9 @@ function npNextTrack() {
 
   _scRYMbleUi.setMarquee(toScrobble[currentlyScrobbling].trackName);
 
-  // TODO - Refactor string generation
-  let postdataStr = "";
-  let firstTime = true;
-  for (const currKey in postdata) {
-    if (firstTime) {
-      firstTime = false;
-    } else {
-      postdataStr = `${postdataStr}&`;
-    }
-    postdataStr = postdataStr + encodeURIComponent(currKey) + "=" + encodeURIComponent(postdata[currKey]);
-  }
-
+  const postdataStr = Object.entries(postdata)
+    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+    .join("&");
   httpRequestHelper.httpPost(npURL, postdataStr, acceptNPResponse);
 }
 

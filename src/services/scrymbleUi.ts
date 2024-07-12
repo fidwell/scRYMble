@@ -59,7 +59,7 @@ export default class scRYMbleUi {
       <br/>
       <table border="2" cellpadding="0" cellspacing="0">
         <tr>
-          <td style="height: 50px; width: 103px; background: url(http://cdn.last.fm/flatness/logo_black.3.png) no-repeat; color: #fff;">
+          <td style="height: 50px; width: 103px; background: url(https://cdn.last.fm/flatness/logo_black.3.png) no-repeat; color: #fff;">
             <marquee scrollamount="3" scrolldelay="200" behavior="alternate" style="font-size: 80%; position: relative; top: 17px;" id="${this.marqueeId}">&nbsp;</marquee>
           </td>
         </tr>
