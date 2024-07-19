@@ -222,15 +222,15 @@ function submitThisTrack(): void {
   const i = 0;
   const currTime = fetch_unix_timestamp();
 
-  postdata[`a${i}`] = toScrobble[currentlyScrobbling].artist;
-  postdata[`t${i}`] = toScrobble[currentlyScrobbling].trackName;
-  postdata[`b${i}`] = getAlbum();
-  postdata[`n${i}`] = `${currentlyScrobbling + 1}`;
-  postdata[`l${i}`] = `${toScrobble[currentlyScrobbling].duration}`;
-  postdata[`i${i}`] = `${currTime - toScrobble[currentlyScrobbling].duration}`;
-  postdata[`o${i}`] = "P";
-  postdata[`r${i}`] = "";
-  postdata[`m${i}`] = "";
+  postdata[`a[${i}]`] = toScrobble[currentlyScrobbling].artist;
+  postdata[`t[${i}]`] = toScrobble[currentlyScrobbling].trackName;
+  postdata[`b[${i}]`] = getAlbum();
+  postdata[`n[${i}]`] = `${currentlyScrobbling + 1}`;
+  postdata[`l[${i}]`] = `${toScrobble[currentlyScrobbling].duration}`;
+  postdata[`i[${i}]`] = `${currTime - toScrobble[currentlyScrobbling].duration}`;
+  postdata[`o[${i}]`] = "P";
+  postdata[`r[${i}]`] = "";
+  postdata[`m[${i}]`] = "";
 
   postdata["s"] = sessID;
 
