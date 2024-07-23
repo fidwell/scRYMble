@@ -107,7 +107,7 @@ export default class scRYMbleUi {
 
   allOrNoneAction(): void {
     for (const checkbox of this.checkboxes) {
-      (checkbox as HTMLInputElement).checked = this.allOrNoneCheckbox.checked;
+      checkbox.checked = this.allOrNoneCheckbox.checked;
     }
   }
 
@@ -152,6 +152,7 @@ export default class scRYMbleUi {
     return document.getElementById(this.scrobbleThenId) as HTMLButtonElement;
   }
 
+  // TODO - Replace deprecated marquee
   private get marquee(): HTMLMarqueeElement {
     return document.getElementById(this.marqueeId) as HTMLMarqueeElement;
   }
@@ -165,11 +166,11 @@ export default class scRYMbleUi {
   }
 
   private get passwordInput(): HTMLInputElement {
-    return document.getElementById(this.passwordId) as HTMLInputElement;
+    return document.querySelector(this.passwordId) as HTMLInputElement;
   }
 
-  private get checkboxes(): HTMLCollectionOf<Element> {
-    return document.getElementsByClassName(this.checkboxClass);
+  get checkboxes(): HTMLCollectionOf<HTMLInputElement> {
+    return document.getElementsByClassName(this.checkboxClass) as HTMLCollectionOf<HTMLInputElement>;
   }
   //#endregion
 }

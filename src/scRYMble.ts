@@ -73,28 +73,27 @@ function acceptNPResponse(responseDetails: HttpResponse) {
 function buildListOfSongsToScrobble() {
   toScrobble = [];
 
-  // TODO - Remove jQuery
-  $.each($(".scrymblechk"), function () {
-    if ($(this).is(":checked")) {
-      const song = $(this).parent().parent();
-      let songTitle = $(song).find("span[itemprop=\"name\"]").text();
+  Array.from(_scRYMbleUi.checkboxes).forEach(checkbox => {
+    if (checkbox.checked) {
+      const tracklistLine = _rymUi.tracklistLine(checkbox);
+      let songTitle = _rymUi.trackName(tracklistLine);
       let artist: string = _rymUi.pageArtist;
-      const length = $(song).find(".tracklist_duration").text();
+      const length = _rymUi.trackDuration(tracklistLine);
 
       if (isVariousArtists()) {
         const firstDash = songTitle.indexOf(" - ");
         if (firstDash === -1) {
           // no dash exists! must be a single artist with " / " in the name or v/a with unscrobbleable list
           if (artist.indexOf("Various Artists") > -1) {
-            artist = $(".album_title:eq(0)").text();
+            artist = _rymUi.pageAlbum;
           }
         } else {
           artist = songTitle.substring(0, firstDash);
           songTitle = songTitle.substring(firstDash + 3);
         }
       } else {
-        const title = $(song).find("span[itemprop=\"name\"]");
-        if ($(title).html().indexOf("<a title=\"[Artist") === 0 && $(title).text().indexOf(" - ") > 0) {
+        const trackArtist = _rymUi.trackArtist(tracklistLine);
+        if (trackArtist.length > 0 && songTitle.indexOf(" - ") > 0) {
           const firstDash = songTitle.indexOf(" - ");
           artist = songTitle.substring(0, firstDash);
           songTitle = songTitle.substring(firstDash + 3);
