@@ -176,7 +176,7 @@ export default class scRYMbleUi {
   }
 
   private get passwordInput(): HTMLInputElement {
-    return document.querySelector(this.passwordId) as HTMLInputElement;
+    return document.getElementById(this.passwordId) as HTMLInputElement;
   }
 
   get checkboxes(): HTMLCollectionOf<HTMLInputElement> {

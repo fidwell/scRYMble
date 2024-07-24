@@ -1,5 +1,5 @@
 export default class rymUi {
-  private albumTitleClass = "album_title";
+  private albumTitleClass = ".album_title";
   private byArtistProperty = "byArtist";
   private creditedNameClass = "credited_name";
   private trackElementId = "tracks";
