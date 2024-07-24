@@ -3,10 +3,10 @@ export default class rymUi {
   private byArtistProperty = "byArtist";
   private creditedNameClass = "credited_name";
   private trackElementId = "tracks";
-  private tracklistDurationClass = "tracklist_duration";
+  private tracklistDurationClass = ".tracklist_duration";
   private tracklistLineClass = "tracklist_line";
-  private tracklistNumClass = "tracklist_num";
-  private tracklistTitleClass = "tracklist_title";
+  private tracklistNumClass = ".tracklist_num";
+  private tracklistTitleClass = ".tracklist_title";
 
   get pageArtist(): string {
     return this.multipleByArtists ?? this.singleByArtist;
@@ -28,7 +28,7 @@ export default class rymUi {
   }
 
   hasTrackNumber(tracklistLine: HTMLDivElement): boolean {
-    return tracklistLine.getElementsByClassName(this.tracklistNumClass)[0].innerHTML.trim().length > 0;
+    return (tracklistLine.querySelector(this.tracklistNumClass)?.innerHTML ?? "").trim().length > 0;
   }
 
   //#region Element getters
