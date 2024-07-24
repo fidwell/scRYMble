@@ -61,7 +61,9 @@ export default class scRYMbleUi {
       <table border="2" cellpadding="0" cellspacing="0">
         <tr>
           <td style="height: 50px; width: 103px; background: url(https://cdn.last.fm/flatness/logo_black.3.png) no-repeat; color: #fff;">
-            <marquee scrollamount="3" scrolldelay="200" behavior="alternate" style="font-size: 80%; position: relative; top: 17px;" id="${this.marqueeId}">&nbsp;</marquee>
+            <div class="marquee" style="position: relative; top: 17px; overflow: hidden; white-space: nowrap;">
+              <span style="font-size: 80%; width: 88px; display: inline-block; animation: marquee 5s linear infinite;" id="${this.marqueeId}">&nbsp;</span>
+            </div>
           </td>
         </tr>
         <tr>
@@ -83,6 +85,14 @@ export default class scRYMbleUi {
 
     this._rymUi.trackListDiv?.after(eleButtonDiv);
     this.allOrNoneCheckbox.addEventListener("click", () => this.allOrNoneClick(), true);
+
+    const marqueeStyle = document.createElement("style");
+    document.head.appendChild(marqueeStyle);
+    marqueeStyle.textContent = `
+      @keyframes marquee {
+        0% { transform: translateX(100%); }
+        100% { transform: translateX(-100%); }
+      }`;
   }
 
   hookUpScrobbleNow(startScrobble: () => void): void {
@@ -162,9 +172,8 @@ export default class scRYMbleUi {
     return document.getElementById(this.testId) as HTMLButtonElement;
   }
 
-  // TODO - Replace deprecated marquee
-  private get marquee(): HTMLMarqueeElement {
-    return document.getElementById(this.marqueeId) as HTMLMarqueeElement;
+  private get marquee(): HTMLDivElement {
+    return document.getElementById(this.marqueeId) as HTMLDivElement;
   }
 
   private get progressBar(): HTMLDivElement {
