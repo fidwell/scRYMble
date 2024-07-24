@@ -296,6 +296,17 @@ function handshakeBatch(): void {
   handshake(_scRYMbleUi, acceptHandshakeBatch);
 }
 
+function scrobbleTest(): void {
+  console.log(_rymUi.pageAlbum);
+  buildListOfSongsToScrobble();
+  toScrobble.forEach((song, i) => {
+    const minutes = Math.round(song.duration / 60);
+    const seconds = song.duration % 60;
+    const secondsStr = `00${seconds}`.slice(-2);
+    console.log(`${i + 1}. ${song.artist} — ${song.trackName} (${minutes}:${secondsStr})`);
+  });
+}
+
 (function () {
   if (!_scRYMbleUi.isEnabled) {
     return;
@@ -303,5 +314,6 @@ function handshakeBatch(): void {
 
   _scRYMbleUi.hookUpScrobbleNow(startScrobble);
   _scRYMbleUi.hookUpScrobbleThen(handshakeBatch);
+  _scRYMbleUi.hookUpScrobbleTest(scrobbleTest);
   window.addEventListener("beforeunload", confirmBrowseAway, true);
 })();

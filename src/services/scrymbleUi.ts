@@ -8,6 +8,7 @@ export default class scRYMbleUi {
   private progBarId = "progbar";
   private scrobbleNowId = "scrobblenow";
   private scrobbleThenId = "scrobblethen";
+  private testId = "scrobbletest";
   private checkboxClass = "scrymblechk";
   private selectAllOrNoneId = "allornone";
   private usernameId = "scrobbleusername";
@@ -74,6 +75,7 @@ export default class scRYMbleUi {
         pass: <input type="password" size="16" id="${this.passwordId}" value="${GM_getValue("pass", "")}"></input><br />
         <input type="button" id="${this.scrobbleNowId}" value="Scrobble in real-time" />
         <input type="button" id="${this.scrobbleThenId}" value="Scrobble a previous play" />
+        <input type="button" id="${this.testId}" value="Test tracklist parsing" style="display: none;" />
       </td>
     </tr>
   </table>`;
@@ -89,6 +91,10 @@ export default class scRYMbleUi {
 
   hookUpScrobbleThen(handshakeBatch: () => void): void {
     this.scrobbleThenButton.addEventListener("click", handshakeBatch, true);
+  }
+
+  hookUpScrobbleTest(callback: () => void): void {
+    this.scrobbleTestButton.addEventListener("click", callback, true);
   }
 
   setMarquee(value: string): void {
@@ -150,6 +156,10 @@ export default class scRYMbleUi {
 
   private get scrobbleThenButton(): HTMLButtonElement {
     return document.getElementById(this.scrobbleThenId) as HTMLButtonElement;
+  }
+
+  private get scrobbleTestButton(): HTMLButtonElement {
+    return document.getElementById(this.testId) as HTMLButtonElement;
   }
 
   // TODO - Replace deprecated marquee
