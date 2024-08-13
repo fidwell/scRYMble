@@ -6,7 +6,8 @@ export default class rymUi {
   private tracklistDurationClass = ".tracklist_duration";
   private tracklistLineClass = "tracklist_line";
   private tracklistNumClass = ".tracklist_num";
-  private tracklistTitleClass = ".tracklist_title";
+  private tracklistSongClass = ".song";
+  private tracklistArtistClass = ".artist";
 
   get pageArtist(): string {
     return this.multipleByArtists ?? this.singleByArtist;
@@ -46,18 +47,19 @@ export default class rymUi {
   }
 
   trackName(tracklistLine: HTMLDivElement) {
-    return tracklistLine
-      ?.querySelector(this.tracklistTitleClass)
-      ?.querySelector("span")
-      ?.innerText ?? "";
+    const songTag = tracklistLine?.querySelector(this.tracklistSongClass) as HTMLDivElement;
+    const songTitle = songTag?.innerHTML ?? "";
+    if (this.trackArtist(tracklistLine).length > 0 && songTitle.indexOf(" - ") === 0) {
+      // Artist-credited track list
+      return songTitle.substring(3);
+    } else {
+      return songTitle;
+    }
   }
 
   trackArtist(tracklistLine: HTMLDivElement) {
-    return tracklistLine
-      ?.querySelector(this.tracklistTitleClass)
-      ?.querySelector("span")
-      ?.querySelector("a")
-      ?.innerText ?? "";
+    const artistTag = tracklistLine?.querySelector(this.tracklistArtistClass) as HTMLDivElement;
+    return artistTag?.innerText ?? "";
   }
 
   trackDuration(tracklistLine: HTMLDivElement) {

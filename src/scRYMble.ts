@@ -81,15 +81,12 @@ function buildListOfSongsToScrobble() {
       const length = _rymUi.trackDuration(tracklistLine);
 
       if (isVariousArtists()) {
-        const firstDash = songTitle.indexOf(" - ");
-        if (firstDash === -1) {
+        artist = _rymUi.trackArtist(tracklistLine);
+        if (artist.length === 0) {
           // no dash exists! must be a single artist with " / " in the name or v/a with unscrobbleable list
           if (artist.indexOf("Various Artists") > -1) {
             artist = _rymUi.pageAlbum;
           }
-        } else {
-          artist = songTitle.substring(0, firstDash);
-          songTitle = songTitle.substring(firstDash + 3);
         }
       } else {
         const trackArtist = _rymUi.trackArtist(tracklistLine);
