@@ -6,7 +6,8 @@ export default class rymUi {
   private tracklistDurationClass = ".tracklist_duration";
   private tracklistLineClass = "tracklist_line";
   private tracklistNumClass = ".tracklist_num";
-  private tracklistSongClass = ".song";
+  private tracklistTitleClass = ".tracklist_title";
+  private tracklistSongClass = ".song ";
   private tracklistArtistClass = ".artist";
 
   get pageArtist(): string {
@@ -47,9 +48,11 @@ export default class rymUi {
   }
 
   trackName(tracklistLine: HTMLDivElement) {
-    const songTag = tracklistLine?.querySelector(this.tracklistSongClass) as HTMLDivElement;
-    const songTitle = songTag?.innerHTML ?? "";
-    if (this.trackArtist(tracklistLine).length > 0 && songTitle.indexOf(" - ") === 0) {
+    const songTags = tracklistLine?.querySelectorAll(this.tracklistSongClass);
+    const lastSongTag = songTags[songTags.length - 1];
+    const songTitle = lastSongTag?.innerHTML ?? "";
+    if (this.trackArtist(tracklistLine).length > 0 &&
+      (songTitle.indexOf(" - ") === 0 || songTitle.indexOf("\n- ") === 0)) {
       // Artist-credited track list
       return songTitle.substring(3);
     } else {
@@ -58,8 +61,20 @@ export default class rymUi {
   }
 
   trackArtist(tracklistLine: HTMLDivElement) {
-    const artistTag = tracklistLine?.querySelector(this.tracklistArtistClass) as HTMLDivElement;
-    return artistTag?.innerText ?? "";
+    const artistTags = tracklistLine?.querySelectorAll(this.tracklistArtistClass);
+
+    if (artistTags.length === 0)
+      return "";
+
+    if (artistTags.length === 1) {
+      return (artistTags[0] as HTMLDivElement).innerText;
+    }
+
+    // Multiple artists
+    const entireSpan = tracklistLine.querySelector(this.tracklistTitleClass) as HTMLDivElement;
+    const entireText = entireSpan.innerText;
+    const dashIndex = entireText.indexOf("\n- ");
+    return entireText.substring(0, dashIndex).replace(/\n/g, " ");
   }
 
   trackDuration(tracklistLine: HTMLDivElement) {

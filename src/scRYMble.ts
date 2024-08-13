@@ -90,10 +90,8 @@ function buildListOfSongsToScrobble() {
         }
       } else {
         const trackArtist = _rymUi.trackArtist(tracklistLine);
-        if (trackArtist.length > 0 && songTitle.indexOf(" - ") > 0) {
-          const firstDash = songTitle.indexOf(" - ");
-          artist = songTitle.substring(0, firstDash);
-          songTitle = songTitle.substring(firstDash + 3);
+        if (trackArtist.length > 0) {
+          artist = trackArtist;
         }
       }
 
