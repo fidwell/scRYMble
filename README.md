@@ -14,7 +14,7 @@ Download the script from GreasyFork: [https://greasyfork.org/en/scripts/500052-s
 
 Visit any release page on RateYourMusic (`https://rateyourmusic.com/release/*`) that has a tracklist. scRYMble will add scrobbling controls below the tracklist:
 
-![image](https://github.com/fidwell/scRYMble/assets/5436387/c9331226-ed27-4e23-acde-9ec836f4195f)
+![image](https://github.com/user-attachments/assets/ba979199-64de-47cd-9356-8368b5e3f9aa)
 
 Fill in your last.fm username and password. You can also check and uncheck tracks you wish to scrobble or ignore.
 
