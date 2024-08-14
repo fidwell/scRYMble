@@ -72,41 +72,47 @@ function acceptNPResponse(responseDetails: HttpResponse) {
 
 function buildListOfSongsToScrobble() {
   toScrobble = [];
-
   Array.from(_scRYMbleUi.checkboxes).forEach(checkbox => {
     if (checkbox.checked) {
-      const tracklistLine = _rymUi.tracklistLine(checkbox);
-      let songTitle = _rymUi.trackName(tracklistLine);
-      let artist: string = _rymUi.pageArtist;
-      const length = _rymUi.trackDuration(tracklistLine);
-
-      if (isVariousArtists()) {
-        artist = _rymUi.trackArtist(tracklistLine);
-        if (artist.length === 0) {
-          // no dash exists! must be a single artist with " / " in the name or v/a with unscrobbleable list
-          if (artist.indexOf("Various Artists") > -1) {
-            artist = _rymUi.pageAlbum;
-          }
-        }
-      } else {
-        const trackArtist = _rymUi.trackArtist(tracklistLine);
-        if (trackArtist.length > 0) {
-          artist = trackArtist;
-        }
-      }
-
-      if (songTitle.toLowerCase() === "untitled" ||
-        songTitle.toLowerCase() === "untitled track" ||
-        songTitle === "") {
-        songTitle = "[untitled]";
-      }
-
-      while (songTitle.indexOf("  ") > 0) {
-        songTitle = songTitle.replace("  ", " ");
-      }
-      toScrobble[toScrobble.length] = new ScrobbleRecord(songTitle, artist, length);
+      toScrobble[toScrobble.length] = parseTracklistLine(_rymUi.pageArtist, isVariousArtists(), _rymUi.tracklistLine(checkbox));
     }
   });
+}
+
+function parseTracklistLine(
+  pageArtist: string,
+  isVariousArtists: boolean,
+  tracklistLine: HTMLDivElement): ScrobbleRecord {
+  let songTitle = _rymUi.trackName(tracklistLine);
+  let artist: string = pageArtist;
+  const length = _rymUi.trackDuration(tracklistLine);
+
+  if (isVariousArtists) {
+    artist = _rymUi.trackArtist(tracklistLine);
+    console.log(`Couldn't determine artist for track "${songTitle}".`);
+    if (artist.length === 0) {
+      artist = pageArtist.indexOf("Various Artists") > -1
+        ? _rymUi.pageAlbum
+        : pageArtist;
+    }
+  } else {
+    const trackArtist = _rymUi.trackArtist(tracklistLine);
+    if (trackArtist.length > 0) {
+      artist = trackArtist;
+    }
+  }
+
+  if (songTitle.toLowerCase() === "untitled" ||
+    songTitle.toLowerCase() === "untitled track" ||
+    songTitle === "") {
+    songTitle = "[untitled]";
+  }
+
+  while (songTitle.indexOf("  ") > 0) {
+    songTitle = songTitle.replace("  ", " ");
+  }
+
+  return new ScrobbleRecord(songTitle, artist, length);
 }
 
 function submitTracksBatch(sessID: string, submitURL: string) {
