@@ -9,6 +9,12 @@ export default class rymUi {
   private tracklistTitleClass = ".tracklist_title";
   private tracklistArtistClass = ".artist";
 
+  get isVariousArtists(): boolean {
+    const artist: string = this.pageArtist;
+    return artist.indexOf("Various Artists") > -1 ||
+      artist.indexOf(" / ") > -1;
+  }
+
   get pageArtist(): string {
     return this.multipleByArtists ?? this.singleByArtist;
   }
@@ -24,8 +30,11 @@ export default class rymUi {
   }
 
   private get singleByArtist(): string {
-    return Array.from(document.getElementsByTagName("span"))
-      .filter(x => !!x.hasAttribute("itemprop") && x.getAttribute("itemprop") === this.byArtistProperty)[0].innerText;
+    const byArtistSpans = Array.from(document.getElementsByTagName("span"))
+      .filter(x => !!x.hasAttribute("itemprop") && x.getAttribute("itemprop") === this.byArtistProperty);
+    return byArtistSpans.length === 1
+      ? byArtistSpans[0].innerText
+      : "";
   }
 
   hasTrackNumber(tracklistLine: HTMLDivElement): boolean {
@@ -76,7 +85,7 @@ export default class rymUi {
   }
 
   trackDuration(tracklistLine: HTMLDivElement) {
-    return (tracklistLine?.querySelector(this.tracklistDurationClass) as HTMLDivElement).innerText.trim();
+    return ((tracklistLine?.querySelector(this.tracklistDurationClass) as HTMLDivElement).innerText ?? "").trim();
   }
   //#endregion
 }
