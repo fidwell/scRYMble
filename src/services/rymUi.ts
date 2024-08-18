@@ -1,3 +1,5 @@
+import { stripAndClean } from "./utilities";
+
 export default class rymUi {
   private albumTitleClass = ".album_title";
   private byArtistProperty = "byArtist";
@@ -8,6 +10,7 @@ export default class rymUi {
   private tracklistNumClass = ".tracklist_num";
   private tracklistTitleClass = ".tracklist_title";
   private tracklistArtistClass = ".artist";
+  private tracklistRenderedTextClass = ".rendered_text";
 
   constructor(readonly overridePageArtist: string | undefined) { }
 
@@ -63,13 +66,16 @@ export default class rymUi {
   trackName(tracklistLine: HTMLDivElement) {
     const songTags = tracklistLine?.querySelectorAll("[itemprop=name]");
     const lastSongTag = songTags[songTags.length - 1] as HTMLSpanElement;
-    const songTitle = (lastSongTag?.textContent ?? "").replace(/\n/g, " ");
-    if (this.trackArtist(tracklistLine).length > 0 && songTitle.indexOf(" - ") === 0) {
-      // Artist-credited track list
-      return songTitle.substring(3);
-    } else {
-      return songTitle;
+    let songTitle = (lastSongTag?.textContent ?? "").replace(/\n/g, " ");
+
+    // Check if the tag is hiding any artist links; if so, strip them out
+    const artistLinks = lastSongTag.querySelectorAll(this.tracklistArtistClass);
+    if (artistLinks.length > 0) {
+      const renderedTextSpan = lastSongTag.querySelector(this.tracklistRenderedTextClass) as HTMLSpanElement;
+      songTitle = renderedTextSpan.innerHTML.replace(/<a[^>]*>.*?<\/a>/g, " ").trim();
     }
+
+    return stripAndClean(songTitle);
   }
 
   trackArtist(tracklistLine: HTMLDivElement) {

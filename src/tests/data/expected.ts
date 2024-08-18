@@ -91,7 +91,7 @@ export const split: ScrobbleRecord[] = [
   },
 ];
 
-export const compoundArtists: ScrobbleRecord[] = [
+export const braidWithLinks: ScrobbleRecord[] = [
   <ScrobbleRecord>{
     artist: "Jami Sieber",
     trackName: "Maenam",
@@ -144,7 +144,60 @@ export const compoundArtists: ScrobbleRecord[] = [
   }
 ];
 
-export const singleArtist: ScrobbleRecord[] = [
+export const braidWithoutLinks: ScrobbleRecord[] = [
+  <ScrobbleRecord>{
+    artist: "Jami Sieber",
+    trackName: "Maenam",
+    duration: 5 * 60 + 39
+  },
+  <ScrobbleRecord>{
+    artist: "Shira Kammen",
+    trackName: "Downstream",
+    duration: 6 * 60 + 36
+  },
+  <ScrobbleRecord>{
+    artist: "Shira Kammen & Pam Swan",
+    trackName: "Lullaby Set",
+    duration: 6 * 60 + 18
+  },
+  <ScrobbleRecord>{
+    artist: "Cheryl Ann Fulton",
+    trackName: "Romanesca",
+    duration: 2 * 60 + 31
+  },
+  <ScrobbleRecord>{
+    artist: "Jami Sieber",
+    trackName: "Long Past Gone",
+    duration: 4 * 60 + 44
+  },
+  <ScrobbleRecord>{
+    artist: "Jami Sieber",
+    trackName: "The Darkening Ground",
+    duration: 3 * 60 + 12
+  },
+  <ScrobbleRecord>{
+    artist: "Jami Sieber",
+    trackName: "Undercurrent",
+    duration: 5 * 60 + 34
+  },
+  <ScrobbleRecord>{
+    artist: "Jami Sieber",
+    trackName: "Tell It by Heart",
+    duration: 5 * 60 + 50
+  },
+  <ScrobbleRecord>{
+    artist: "Jami Sieber",
+    trackName: "Maenam (Jon Schatz remix)",
+    duration: 7 * 60 + 5
+  },
+  <ScrobbleRecord>{
+    artist: "Jami Sieber",
+    trackName: "Undercurrent (Jon Schatz remix)",
+    duration: 4 * 60 + 54
+  }
+];
+
+export const dieMenschMaschine: ScrobbleRecord[] = [
   <ScrobbleRecord>{
     artist: "Kraftwerk",
     trackName: "Die Roboter",

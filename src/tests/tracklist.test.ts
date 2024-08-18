@@ -4,7 +4,7 @@ import ScrobbleRecord from "../models/ScrobbleRecord";
 import rymUi from "../services/rymUi";
 import scRYMbleUi from "../services/scrymbleUi";
 import { uiParser } from "../services/uiParser";
-import { compoundArtists, headOnTheDoor, singleArtist, split } from "./data/expected";
+import { braidWithLinks, braidWithoutLinks, dieMenschMaschine, headOnTheDoor, split } from "./data/expected";
 
 describe("Tracklist parsing tests", () => {
   function setup(filename: string) {
@@ -37,7 +37,7 @@ describe("Tracklist parsing tests", () => {
   }
 
   test("should parse a release with a single artist", () => {
-    testCase("singleArtist", "Kraftwerk", singleArtist);
+    testCase("singleArtist", "Kraftwerk", dieMenschMaschine);
   });
 
   test("should parse a tracklist with no song links", () => {
@@ -49,6 +49,10 @@ describe("Tracklist parsing tests", () => {
   });
 
   test("should parse a release with compound track artists", () => {
-    testCase("compoundArtists", "Jami Sieber", compoundArtists);
+    testCase("compoundArtists", "Jami Sieber", braidWithLinks);
+  });
+
+  test("should parse a release with compound track artists but no song links", () => {
+    testCase("compoundArtistsNoLinks", "Jami Sieber", braidWithoutLinks);
   });
 });

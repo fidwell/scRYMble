@@ -10,17 +10,14 @@ export abstract class uiParser {
     const toScrobble: ScrobbleRecord[] = [];
     Array.from(_scRYMbleUi.checkboxes).forEach(checkbox => {
       if (checkbox.checked) {
-        toScrobble[toScrobble.length] = uiParser.parseTracklistLine(
-          // TODO: refactor this vvvv
-          _rymUi, _rymUi.tracklistLine(checkbox));
+        toScrobble[toScrobble.length] = uiParser.parseTracklistLine(_rymUi, checkbox);
       }
     });
     return toScrobble;
   }
 
-  public static parseTracklistLine(
-    rymUi: rymUi,
-    tracklistLine: HTMLDivElement): ScrobbleRecord {
+  public static parseTracklistLine(rymUi: rymUi, checkbox: HTMLInputElement): ScrobbleRecord {
+    const tracklistLine = rymUi.tracklistLine(checkbox);
     const pageArtist = rymUi.pageArtist;
 
     let songTitle = rymUi.trackName(tracklistLine);
@@ -46,10 +43,6 @@ export abstract class uiParser {
       songTitle.toLowerCase() === "untitled track" ||
       songTitle === "") {
       songTitle = "[untitled]";
-    }
-
-    while (songTitle.indexOf("  ") > 0) {
-      songTitle = songTitle.replace("  ", " ");
     }
 
     return new ScrobbleRecord(songTitle, artist, duration);
