@@ -90,3 +90,89 @@ export const split: ScrobbleRecord[] = [
     duration: 180
   },
 ];
+
+export const compoundArtists: ScrobbleRecord[] = [
+  <ScrobbleRecord>{
+    artist: "Jami Sieber",
+    trackName: "Maenam",
+    duration: 5 * 60 + 39
+  },
+  <ScrobbleRecord>{
+    artist: "Shira Kammen",
+    trackName: "Downstream",
+    duration: 6 * 60 + 37
+  },
+  <ScrobbleRecord>{
+    artist: "Shira Kammen & Pam Swan",
+    trackName: "Lullaby Set",
+    duration: 6 * 60 + 18
+  },
+  <ScrobbleRecord>{
+    artist: "Cheryl Ann Fulton",
+    trackName: "Romanesca",
+    duration: 2 * 60 + 31
+  },
+  <ScrobbleRecord>{
+    artist: "Jami Sieber",
+    trackName: "Long Past Gone",
+    duration: 4 * 60 + 45
+  },
+  <ScrobbleRecord>{
+    artist: "Jami Sieber",
+    trackName: "The Darkening Ground",
+    duration: 3 * 60 + 13
+  },
+  <ScrobbleRecord>{
+    artist: "Jami Sieber",
+    trackName: "Undercurrent",
+    duration: 5 * 60 + 34
+  },
+  <ScrobbleRecord>{
+    artist: "Jami Sieber",
+    trackName: "Tell It by Heart",
+    duration: 5 * 60 + 50
+  },
+  <ScrobbleRecord>{
+    artist: "Jami Sieber",
+    trackName: "Maenam",
+    duration: 7 * 60 + 5
+  },
+  <ScrobbleRecord>{
+    artist: "Jami Sieber",
+    trackName: "Undercurrent",
+    duration: 4 * 60 + 55
+  }
+];
+
+export const singleArtist: ScrobbleRecord[] = [
+  <ScrobbleRecord>{
+    artist: "Kraftwerk",
+    trackName: "Die Roboter",
+    duration: 6 * 60 + 9
+  },
+  <ScrobbleRecord>{
+    artist: "Kraftwerk",
+    trackName: "Spacelab",
+    duration: 5 * 60 + 56
+  },
+  <ScrobbleRecord>{
+    artist: "Kraftwerk",
+    trackName: "Metropolis",
+    duration: 5 * 60 + 59
+  },
+  <ScrobbleRecord>{
+    artist: "Kraftwerk",
+    trackName: "Das Model",
+    duration: 3 * 60 + 39
+  },
+  <ScrobbleRecord>{
+    artist: "Kraftwerk",
+    trackName: "Neonlicht",
+    duration: 9 * 60 + 5
+  },
+  <ScrobbleRecord>{
+    artist: "Kraftwerk",
+    trackName: "Die Mensch-Maschine",
+    duration: 5 * 60 + 25
+  }
+];

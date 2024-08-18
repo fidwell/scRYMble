@@ -4,7 +4,7 @@ import ScrobbleRecord from "../models/ScrobbleRecord";
 import rymUi from "../services/rymUi";
 import scRYMbleUi from "../services/scrymbleUi";
 import { uiParser } from "../services/uiParser";
-import { headOnTheDoor, split } from "./data/expected";
+import { compoundArtists, headOnTheDoor, singleArtist, split } from "./data/expected";
 
 describe("Tracklist parsing tests", () => {
   function setup(filename: string) {
@@ -36,11 +36,19 @@ describe("Tracklist parsing tests", () => {
     }
   }
 
+  test("should parse a release with a single artist", () => {
+    testCase("singleArtist", "Kraftwerk", singleArtist);
+  });
+
   test("should parse a tracklist with no song links", () => {
     testCase("noSongLinks", "The Cure", headOnTheDoor);
   });
 
   test("should parse a split release", () => {
     testCase("split", "Prosanctus Inferi / Witch Tomb", split);
+  });
+
+  test("should parse a release with compound track artists", () => {
+    testCase("compoundArtists", "Jami Sieber", compoundArtists);
   });
 });
