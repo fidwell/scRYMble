@@ -5,6 +5,7 @@ import * as httpRequestHelper from "./services/httpRequestHelper";
 import { handshake } from "./services/lastfm";
 import rymUi from "./services/rymUi";
 import scRYMbleUi from "./services/scrymbleUi";
+import { uiParser } from "./services/uiParser";
 import { fetch_unix_timestamp } from "./services/utilities";
 
 const _rymUi = new rymUi();
@@ -24,12 +25,6 @@ function confirmBrowseAway(oEvent: BeforeUnloadEvent): string {
     return "You are currently scrobbling a record. Leaving the page now will prevent future tracks from this release from scrobbling.";
   }
   return "";
-}
-
-function isVariousArtists(): boolean {
-  const artist: string = _rymUi.pageArtist;
-  return artist.indexOf("Various Artists") > -1 ||
-    artist.indexOf(" / ") > -1;
 }
 
 function acceptSubmitResponse(responseDetails: HttpResponse, isBatch: boolean) {
@@ -70,53 +65,8 @@ function acceptNPResponse(responseDetails: HttpResponse) {
   }
 }
 
-function buildListOfSongsToScrobble() {
-  toScrobble = [];
-  Array.from(_scRYMbleUi.checkboxes).forEach(checkbox => {
-    if (checkbox.checked) {
-      toScrobble[toScrobble.length] = parseTracklistLine(_rymUi.pageArtist, isVariousArtists(), _rymUi.tracklistLine(checkbox));
-    }
-  });
-}
-
-function parseTracklistLine(
-  pageArtist: string,
-  isVariousArtists: boolean,
-  tracklistLine: HTMLDivElement): ScrobbleRecord {
-  let songTitle = _rymUi.trackName(tracklistLine);
-  let artist: string = pageArtist;
-  const length = _rymUi.trackDuration(tracklistLine);
-
-  if (isVariousArtists) {
-    artist = _rymUi.trackArtist(tracklistLine);
-    if (artist.length === 0) {
-      console.log(`Couldn't determine artist for track "${songTitle}".`);
-      artist = pageArtist.indexOf("Various Artists") > -1
-        ? _rymUi.pageAlbum
-        : pageArtist;
-    }
-  } else {
-    const trackArtist = _rymUi.trackArtist(tracklistLine);
-    if (trackArtist.length > 0) {
-      artist = trackArtist;
-    }
-  }
-
-  if (songTitle.toLowerCase() === "untitled" ||
-    songTitle.toLowerCase() === "untitled track" ||
-    songTitle === "") {
-    songTitle = "[untitled]";
-  }
-
-  while (songTitle.indexOf("  ") > 0) {
-    songTitle = songTitle.replace("  ", " ");
-  }
-
-  return new ScrobbleRecord(songTitle, artist, length);
-}
-
 function submitTracksBatch(sessID: string, submitURL: string) {
-  buildListOfSongsToScrobble();
+  toScrobble = uiParser.buildListOfSongsToScrobble(_rymUi, _scRYMbleUi);
 
   if (toScrobble === null)
     return;
@@ -171,7 +121,7 @@ function startScrobble(): void {
   currTrackPlayTime = 0;
 
   _scRYMbleUi.elementsOff();
-  buildListOfSongsToScrobble();
+  toScrobble = uiParser.buildListOfSongsToScrobble(_rymUi, _scRYMbleUi);
   scrobbleNextSong();
 }
 
@@ -299,7 +249,7 @@ function handshakeBatch(): void {
 
 function scrobbleTest(): void {
   console.log(_rymUi.pageAlbum);
-  buildListOfSongsToScrobble();
+  toScrobble = uiParser.buildListOfSongsToScrobble(_rymUi, _scRYMbleUi);
   toScrobble.forEach((song, i) => {
     const minutes = Math.round(song.duration / 60);
     const seconds = song.duration % 60;

@@ -1,3 +1,5 @@
+import { stripAndClean } from "./utilities";
+
 export default class rymUi {
   private albumTitleClass = ".album_title";
   private byArtistProperty = "byArtist";
@@ -8,24 +10,39 @@ export default class rymUi {
   private tracklistNumClass = ".tracklist_num";
   private tracklistTitleClass = ".tracklist_title";
   private tracklistArtistClass = ".artist";
+  private tracklistRenderedTextClass = ".rendered_text";
+
+  constructor(readonly overridePageArtist: string | undefined) { }
+
+  get isVariousArtists(): boolean {
+    const artist: string = this.pageArtist;
+    return artist.indexOf("Various Artists") > -1 ||
+      artist.indexOf(" / ") > -1;
+  }
 
   get pageArtist(): string {
+    if ((this.overridePageArtist ?? "").length > 0)
+      return this.overridePageArtist ?? "";
+
     return this.multipleByArtists ?? this.singleByArtist;
   }
 
   get pageAlbum(): string {
-    return (document.querySelector(this.albumTitleClass) as HTMLElement).innerText.trim() ?? "";
+    return ((document.querySelector(this.albumTitleClass) as HTMLElement).textContent ?? "").trim();
   }
 
   private get multipleByArtists(): string {
     return Array.from(document.getElementsByClassName(this.creditedNameClass))
       .map(x => x as HTMLElement)
-      .map(x => x.innerText)[1];
+      .map(x => (x.textContent ?? ""))[1];
   }
 
   private get singleByArtist(): string {
-    return Array.from(document.getElementsByTagName("span"))
-      .filter(x => !!x.hasAttribute("itemprop") && x.getAttribute("itemprop") === this.byArtistProperty)[0].innerText;
+    const byArtistSpans = Array.from(document.getElementsByTagName("span"))
+      .filter(x => !!x.hasAttribute("itemprop") && x.getAttribute("itemprop") === this.byArtistProperty);
+    return byArtistSpans.length === 1
+      ? byArtistSpans[0].textContent ?? ""
+      : "";
   }
 
   hasTrackNumber(tracklistLine: HTMLDivElement): boolean {
@@ -49,13 +66,16 @@ export default class rymUi {
   trackName(tracklistLine: HTMLDivElement) {
     const songTags = tracklistLine?.querySelectorAll("[itemprop=name]");
     const lastSongTag = songTags[songTags.length - 1] as HTMLSpanElement;
-    const songTitle = (lastSongTag?.innerText ?? "").replace(/\n/g, " ");
-    if (this.trackArtist(tracklistLine).length > 0 && songTitle.indexOf(" - ") === 0) {
-      // Artist-credited track list
-      return songTitle.substring(3);
-    } else {
-      return songTitle;
+    let songTitle = (lastSongTag?.textContent ?? "").replace(/\n/g, " ");
+
+    // Check if the tag is hiding any artist links; if so, strip them out
+    const artistLinks = lastSongTag.querySelectorAll(this.tracklistArtistClass);
+    if (artistLinks.length > 0) {
+      const renderedTextSpan = lastSongTag.querySelector(this.tracklistRenderedTextClass) as HTMLSpanElement;
+      songTitle = renderedTextSpan.innerHTML.replace(/<a[^>]*>.*?<\/a>/g, " ").trim();
     }
+
+    return stripAndClean(songTitle);
   }
 
   trackArtist(tracklistLine: HTMLDivElement) {
@@ -65,18 +85,19 @@ export default class rymUi {
       return "";
 
     if (artistTags.length === 1) {
-      return (artistTags[0] as HTMLDivElement).innerText;
+      return (artistTags[0] as HTMLDivElement).textContent ?? "";
     }
 
     // Multiple artists
     const entireSpan = tracklistLine.querySelector(this.tracklistTitleClass) as HTMLDivElement;
-    const entireText = entireSpan.innerText.replace(/\n/g, " ");
+    const entireText = (entireSpan.textContent ?? "").replace(/\n/g, " ");
     const dashIndex = entireText.indexOf(" - ");
     return entireText.substring(0, dashIndex);
   }
 
   trackDuration(tracklistLine: HTMLDivElement) {
-    return (tracklistLine?.querySelector(this.tracklistDurationClass) as HTMLDivElement).innerText.trim();
+    const durationElement = tracklistLine?.querySelector(this.tracklistDurationClass) as HTMLDivElement;
+    return (durationElement.textContent ?? "").trim();
   }
   //#endregion
 }
