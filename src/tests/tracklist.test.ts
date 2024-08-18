@@ -3,7 +3,7 @@ import { JSDOM } from "jsdom";
 import ScrobbleRecord from "../models/ScrobbleRecord";
 import rymUi from "../services/rymUi";
 import scRYMbleUi from "../services/scrymbleUi";
-import { uiParser } from "../services/uiParser";
+import * as uiParser from "../services/uiParser";
 import { braidWithLinks, braidWithoutLinks, dieMenschMaschine, headOnTheDoor, split } from "./data/expected";
 
 describe("Tracklist parsing tests", () => {

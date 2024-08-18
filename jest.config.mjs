@@ -3,7 +3,7 @@ const config = {
   coverageProvider: "v8",
   preset: "ts-jest",
   testEnvironment: "node",
-  setupFilesAfterEnv: ["./jest.setup.ts"],
+  setupFilesAfterEnv: ["./jest.setup.js"],
   moduleFileExtensions: ["ts", "tsx", "js", "json", "node"]
 };
 

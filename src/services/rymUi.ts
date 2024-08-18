@@ -34,7 +34,7 @@ export default class rymUi {
   private get multipleByArtists(): string {
     return Array.from(document.getElementsByClassName(this.creditedNameClass))
       .map(x => x as HTMLElement)
-      .map(x => (x.textContent ?? ""))[1];
+      .map(x => x.textContent ?? "")[1];
   }
 
   private get singleByArtist(): string {
