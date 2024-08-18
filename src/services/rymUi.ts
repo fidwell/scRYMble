@@ -7,7 +7,6 @@ export default class rymUi {
   private tracklistLineClass = "tracklist_line";
   private tracklistNumClass = ".tracklist_num";
   private tracklistTitleClass = ".tracklist_title";
-  private tracklistSongClass = ".song ";
   private tracklistArtistClass = ".artist";
 
   get pageArtist(): string {
@@ -48,11 +47,10 @@ export default class rymUi {
   }
 
   trackName(tracklistLine: HTMLDivElement) {
-    const songTags = tracklistLine?.querySelectorAll(this.tracklistSongClass);
-    const lastSongTag = songTags[songTags.length - 1];
-    const songTitle = lastSongTag?.innerHTML ?? "";
-    if (this.trackArtist(tracklistLine).length > 0 &&
-      (songTitle.indexOf(" - ") === 0 || songTitle.indexOf("\n- ") === 0)) {
+    const songTags = tracklistLine?.querySelectorAll("[itemprop=name]");
+    const lastSongTag = songTags[songTags.length - 1] as HTMLSpanElement;
+    const songTitle = (lastSongTag?.innerText ?? "").replace(/\n/g, " ");
+    if (this.trackArtist(tracklistLine).length > 0 && songTitle.indexOf(" - ") === 0) {
       // Artist-credited track list
       return songTitle.substring(3);
     } else {
@@ -72,9 +70,9 @@ export default class rymUi {
 
     // Multiple artists
     const entireSpan = tracklistLine.querySelector(this.tracklistTitleClass) as HTMLDivElement;
-    const entireText = entireSpan.innerText;
-    const dashIndex = entireText.indexOf("\n- ");
-    return entireText.substring(0, dashIndex).replace(/\n/g, " ");
+    const entireText = entireSpan.innerText.replace(/\n/g, " ");
+    const dashIndex = entireText.indexOf(" - ");
+    return entireText.substring(0, dashIndex);
   }
 
   trackDuration(tracklistLine: HTMLDivElement) {

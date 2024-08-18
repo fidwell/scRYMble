@@ -89,8 +89,8 @@ function parseTracklistLine(
 
   if (isVariousArtists) {
     artist = _rymUi.trackArtist(tracklistLine);
-    console.log(`Couldn't determine artist for track "${songTitle}".`);
     if (artist.length === 0) {
+      console.log(`Couldn't determine artist for track "${songTitle}".`);
       artist = pageArtist.indexOf("Various Artists") > -1
         ? _rymUi.pageAlbum
         : pageArtist;
