@@ -25,7 +25,7 @@ export abstract class uiParser {
 
     let songTitle = rymUi.trackName(tracklistLine);
     let artist: string = pageArtist;
-    const length = rymUi.trackDuration(tracklistLine);
+    const duration = rymUi.trackDuration(tracklistLine);
 
     if (rymUi.isVariousArtists) {
       artist = rymUi.trackArtist(tracklistLine);
@@ -52,6 +52,6 @@ export abstract class uiParser {
       songTitle = songTitle.replace("  ", " ");
     }
 
-    return new ScrobbleRecord(songTitle, artist, length);
+    return new ScrobbleRecord(songTitle, artist, duration);
   }
 }

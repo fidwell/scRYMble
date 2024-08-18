@@ -52,3 +52,41 @@ export const headOnTheDoor: ScrobbleRecord[] = [
     duration: 4 * 60 + 50
   }
 ];
+
+export const split: ScrobbleRecord[] = [
+  <ScrobbleRecord>{
+    artist: "Prosanctus Inferi",
+    trackName: "Burning Vestal Apocrypha",
+    duration: 180
+  },
+  <ScrobbleRecord>{
+    artist: "Prosanctus Inferi",
+    trackName: "Benedictine Palpitations",
+    duration: 180
+  },
+  <ScrobbleRecord>{
+    artist: "Prosanctus Inferi",
+    trackName: "Spoiling Sacred Benefactor",
+    duration: 180
+  },
+  <ScrobbleRecord>{
+    artist: "Witch Tomb",
+    trackName: "Intro",
+    duration: 180
+  },
+  <ScrobbleRecord>{
+    artist: "Witch Tomb",
+    trackName: "Burnt Altar",
+    duration: 180
+  },
+  <ScrobbleRecord>{
+    artist: "Witch Tomb",
+    trackName: "Second Cumming",
+    duration: 180
+  },
+  <ScrobbleRecord>{
+    artist: "Witch Tomb",
+    trackName: "Descend",
+    duration: 180
+  },
+];
