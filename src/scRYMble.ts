@@ -251,7 +251,7 @@ function scrobbleTest(): void {
   console.log(_rymUi.pageAlbum);
   toScrobble = uiParser.buildListOfSongsToScrobble(_rymUi, _scRYMbleUi);
   toScrobble.forEach((song, i) => {
-    const minutes = Math.round(song.duration / 60);
+    const minutes = Math.floor(song.duration / 60);
     const seconds = song.duration % 60;
     const secondsStr = `00${seconds}`.slice(-2);
     console.log(`${i + 1}. ${song.artist} — ${song.trackName} (${minutes}:${secondsStr})`);
