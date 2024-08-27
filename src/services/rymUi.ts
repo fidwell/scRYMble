@@ -28,20 +28,20 @@ export default class rymUi {
   }
 
   get pageAlbum(): string {
-    return ((document.querySelector(this.albumTitleClass) as HTMLElement).textContent ?? "").trim();
+    return ((document.querySelector(this.albumTitleClass) as HTMLElement).innerText ?? "").trim();
   }
 
   private get multipleByArtists(): string {
     return Array.from(document.getElementsByClassName(this.creditedNameClass))
       .map(x => x as HTMLElement)
-      .map(x => x.textContent ?? "")[1];
+      .map(x => x.innerText ?? "")[1];
   }
 
   private get singleByArtist(): string {
     const byArtistSpans = Array.from(document.getElementsByTagName("span"))
       .filter(x => !!x.hasAttribute("itemprop") && x.getAttribute("itemprop") === this.byArtistProperty);
     return byArtistSpans.length === 1
-      ? byArtistSpans[0].textContent ?? ""
+      ? byArtistSpans[0].innerText ?? ""
       : "";
   }
 
