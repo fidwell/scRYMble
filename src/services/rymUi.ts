@@ -28,7 +28,9 @@ export default class rymUi {
   }
 
   get pageAlbum(): string {
-    return ((document.querySelector(this.albumTitleClass) as HTMLElement).innerText ?? "").trim();
+    // Not using innerText because it doesn't work with Jest tests.
+    const element = document.querySelector(this.albumTitleClass) as HTMLSpanElement;
+    return (element.firstChild?.textContent ?? "").trim();
   }
 
   private get multipleByArtists(): string {
@@ -38,10 +40,11 @@ export default class rymUi {
   }
 
   private get singleByArtist(): string {
+    // Not using innerText because it doesn't work with Jest tests.
     const byArtistSpans = Array.from(document.getElementsByTagName("span"))
       .filter(x => !!x.hasAttribute("itemprop") && x.getAttribute("itemprop") === this.byArtistProperty);
     return byArtistSpans.length === 1
-      ? byArtistSpans[0].innerText ?? ""
+      ? byArtistSpans[0].textContent ?? ""
       : "";
   }
 
