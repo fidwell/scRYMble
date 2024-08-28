@@ -29,8 +29,8 @@ export default class rymUi {
 
   get pageAlbum(): string {
     // Not using innerText because it doesn't work with Jest tests.
-    const rawText = (document.querySelector(this.albumTitleClass) as HTMLSpanElement).textContent;
-    return (rawText?.substring(0, rawText?.indexOf("\n")) ?? "").trim();
+    const element = (document.querySelector(this.albumTitleClass) as HTMLSpanElement);
+    return (element.firstChild?.textContent ?? "").trim();
   }
 
   private get multipleByArtists(): string {
