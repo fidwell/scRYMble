@@ -62,15 +62,22 @@ export default class rymUi {
   }
 
   trackName(tracklistLine: HTMLDivElement) {
-    const songTags = tracklistLine?.querySelectorAll("[itemprop=name]");
-    const lastSongTag = songTags[songTags.length - 1] as HTMLSpanElement;
-    let songTitle = (lastSongTag?.textContent ?? "").replace(/\n/g, " ");
+    let songTitle = "";
 
-    // Check if the tag is hiding any artist links; if so, strip them out
-    const artistLinks = lastSongTag.querySelectorAll(this.tracklistArtistClass);
-    if (artistLinks.length > 0) {
-      const renderedTextSpan = lastSongTag.querySelector(this.tracklistRenderedTextClass) as HTMLSpanElement;
-      songTitle = renderedTextSpan.innerHTML.replace(/<a[^>]*>.*?<\/a>/g, " ").trim();
+    const songTags = tracklistLine?.querySelectorAll("[itemprop=name]");
+    if (songTags.length > 0) {
+      const lastSongTag = songTags[songTags.length - 1] as HTMLSpanElement;
+      songTitle = (lastSongTag?.textContent ?? "").replace(/\n/g, " ");
+
+      // Check if the tag is hiding any artist links; if so, strip them out
+      const artistLinks = lastSongTag.querySelectorAll(this.tracklistArtistClass);
+      if (artistLinks.length > 0) {
+        const renderedTextSpan = lastSongTag.querySelector(this.tracklistRenderedTextClass) as HTMLSpanElement;
+        songTitle = renderedTextSpan.innerHTML.replace(/<a[^>]*>.*?<\/a>/g, " ").trim();
+      }
+    } else {
+      const renderedTextSpan = tracklistLine?.querySelector(this.tracklistRenderedTextClass) as HTMLSpanElement;
+      songTitle = renderedTextSpan?.textContent ?? "";
     }
 
     return stripAndClean(songTitle);

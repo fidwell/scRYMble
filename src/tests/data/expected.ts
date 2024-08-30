@@ -250,3 +250,20 @@ export const dieMenschMaschine: TestModel = {
     } as ScrobbleRecord
   ]
 };
+
+export const withWorks: TestModel = {
+  artist: "Gavin Bryars",
+  album: "The Sinking of the Titanic",
+  tracks: [
+    {
+      artist: "Gavin Bryars",
+      trackName: "The Sinking of the Titanic",
+      duration: 3 * 60
+    } as ScrobbleRecord,
+    {
+      artist: "Gavin Bryars",
+      trackName: "Jesus' Blood Never Failed Me Yet",
+      duration: 3 * 60
+    } as ScrobbleRecord
+  ]
+};
