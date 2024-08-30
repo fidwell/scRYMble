@@ -308,4 +308,4 @@ export const planets: TestModel = {
       duration: 3 * 60
     } as ScrobbleRecord
   ]
-}
+};
