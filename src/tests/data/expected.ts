@@ -251,7 +251,7 @@ export const dieMenschMaschine: TestModel = {
   ]
 };
 
-export const withWorks: TestModel = {
+export const sinkingOfTheTitanic: TestModel = {
   artist: "Gavin Bryars",
   album: "The Sinking of the Titanic",
   tracks: [
@@ -267,3 +267,45 @@ export const withWorks: TestModel = {
     } as ScrobbleRecord
   ]
 };
+
+export const planets: TestModel = {
+  artist: "Berliner Philharmoniker / Herbert von Karajan",
+  album: "The Planets",
+  tracks: [
+    {
+      artist: "Berliner Philharmoniker / Herbert von Karajan",
+      trackName: "Mars, the Bringer of War",
+      duration: 3 * 60
+    } as ScrobbleRecord,
+    {
+      artist: "Berliner Philharmoniker / Herbert von Karajan",
+      trackName: "Venus, the Bringer of Peace",
+      duration: 3 * 60
+    } as ScrobbleRecord,
+    {
+      artist: "Berliner Philharmoniker / Herbert von Karajan",
+      trackName: "Mercury, the Winged Messenger",
+      duration: 3 * 60
+    } as ScrobbleRecord,
+    {
+      artist: "Berliner Philharmoniker / Herbert von Karajan",
+      trackName: "Jupiter, the Bringer of Jollity",
+      duration: 3 * 60
+    } as ScrobbleRecord,
+    {
+      artist: "Berliner Philharmoniker / Herbert von Karajan",
+      trackName: "Saturn, the Bringer of Old Age",
+      duration: 3 * 60
+    } as ScrobbleRecord,
+    {
+      artist: "Berliner Philharmoniker / Herbert von Karajan",
+      trackName: "Uranus, the Magician",
+      duration: 3 * 60
+    } as ScrobbleRecord,
+    {
+      artist: "Berliner Philharmoniker / Herbert von Karajan",
+      trackName: "Neptune, the Mystic",
+      duration: 3 * 60
+    } as ScrobbleRecord
+  ]
+}

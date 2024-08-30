@@ -26,10 +26,9 @@ function parseTracklistLine(rymUi: rymUi, checkbox: HTMLInputElement): ScrobbleR
   if (rymUi.isVariousArtists) {
     artist = rymUi.trackArtist(tracklistLine);
     if (artist.length === 0) {
-      console.log(`Couldn't determine artist for track "${songTitle}".`);
       artist = pageArtist.indexOf("Various Artists") > -1
         ? rymUi.pageAlbum
-        : pageArtist;
+        : pageArtist; // Probably a collaboration release, like a classical work.
     }
   } else {
     const trackArtist = rymUi.trackArtist(tracklistLine);
