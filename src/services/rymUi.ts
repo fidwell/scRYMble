@@ -12,8 +12,6 @@ export default class rymUi {
   private tracklistArtistClass = ".artist";
   private tracklistRenderedTextClass = ".rendered_text";
 
-  constructor(readonly overridePageArtist: string | undefined) { }
-
   get isVariousArtists(): boolean {
     const artist: string = this.pageArtist;
     return artist.indexOf("Various Artists") > -1 ||
@@ -21,9 +19,6 @@ export default class rymUi {
   }
 
   get pageArtist(): string {
-    if ((this.overridePageArtist ?? "").length > 0)
-      return this.overridePageArtist ?? "";
-
     return this.multipleByArtists ?? this.singleByArtist;
   }
 

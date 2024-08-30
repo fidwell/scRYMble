@@ -22,7 +22,7 @@ describe("Tracklist parsing tests", () => {
     const element = document.querySelector("#tracks");
     expect(element).not.toBeNull();
 
-    const _rymUi = new rymUi(undefined);
+    const _rymUi = new rymUi();
     const _scRYMbleUi = new scRYMbleUi(_rymUi);
     const songList = uiParser.buildListOfSongsToScrobble(_rymUi, _scRYMbleUi);
 

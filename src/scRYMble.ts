@@ -8,7 +8,7 @@ import scRYMbleUi from "./services/scrymbleUi";
 import * as uiParser from "./services/uiParser";
 import { fetch_unix_timestamp } from "./services/utilities";
 
-const _rymUi = new rymUi(undefined);
+const _rymUi = new rymUi();
 const _scRYMbleUi = new scRYMbleUi(_rymUi);
 
 let toScrobble: ScrobbleRecord[] = [];
