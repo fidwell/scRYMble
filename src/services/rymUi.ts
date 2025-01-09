@@ -42,9 +42,9 @@ export default class rymUi {
 
   private parseArtistLink(element: Element) {
     return Array.from(element.childNodes)
-    .filter(node => node.nodeType === 3) // Node.TEXT_NODE
-    .map(node => node.textContent?.trim() ?? "")
-    .join("")
+      .filter(node => node.nodeType === 3) // Node.TEXT_NODE
+      .map(node => node.textContent?.trim() ?? "")
+      .join("")
   }
 
   hasTrackNumber(tracklistLine: HTMLDivElement): boolean {
