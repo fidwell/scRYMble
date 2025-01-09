@@ -309,3 +309,60 @@ export const planets: TestModel = {
     } as ScrobbleRecord
   ]
 };
+
+export const sumojungle: TestModel = {
+  artist: "寺田創一",
+  album: "Sumo Jungle",
+  tracks: [
+    {
+      artist: "寺田創一",
+      trackName: "Sumo Jungle W. Preview",
+      duration: 5 * 60 + 13
+    } as ScrobbleRecord,
+    {
+      artist: "寺田創一",
+      trackName: "Sukiyaki Dohyo Chanko",
+      duration: 4 * 60 + 53
+    } as ScrobbleRecord,
+    {
+      artist: "寺田創一",
+      trackName: "Mawashi Watashi Vs Spasm",
+      duration: 4 * 60 + 57
+    } as ScrobbleRecord,
+    {
+      artist: "寺田創一",
+      trackName: "Mi. Amient Vs Spasm",
+      duration: 4 * 60 + 21
+    } as ScrobbleRecord,
+    {
+      artist: "寺田創一",
+      trackName: "Yokozuna Beach Chillin'",
+      duration:  3 * 60 + 25
+    } as ScrobbleRecord,
+    {
+      artist: "寺田創一",
+      trackName: "Sumotorishu Ga Coming",
+      duration: 4 * 60 + 28
+    } as ScrobbleRecord,
+    {
+      artist: "寺田創一",
+      trackName: "Dosukoi Wrestler Pumpin'",
+      duration: 4 * 60 + 23
+    } as ScrobbleRecord,
+    {
+      artist: "寺田創一",
+      trackName: "Grand Senshuraku",
+      duration: 5 * 60 + 7
+    } as ScrobbleRecord,
+    {
+      artist: "寺田創一",
+      trackName: "Shiko Stepper Rumblin'",
+      duration: 5 * 60 + 7
+    } as ScrobbleRecord,
+    {
+      artist: "寺田創一",
+      trackName: "Hakeyoi Gyoji Referee",
+      duration: 3 * 60 + 51
+    } as ScrobbleRecord
+  ]
+};

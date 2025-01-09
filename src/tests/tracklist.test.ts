@@ -3,7 +3,7 @@ import { JSDOM } from "jsdom";
 import rymUi from "../services/rymUi";
 import scRYMbleUi from "../services/scrymbleUi";
 import * as uiParser from "../services/uiParser";
-import { braidWithLinks, braidWithoutLinks, dieMenschMaschine, headOnTheDoor, planets, sinkingOfTheTitanic, split } from "./data/expected";
+import { braidWithLinks, braidWithoutLinks, dieMenschMaschine, headOnTheDoor, planets, sinkingOfTheTitanic, split, sumojungle } from "./data/expected";
 import TestModel from "./models/TestModel";
 
 describe("Tracklist parsing tests", () => {
@@ -63,5 +63,9 @@ describe("Tracklist parsing tests", () => {
 
   test("should parse a classical release", () => {
     testCase("classical", planets);
+  });
+
+  test("should parse a transliterated artist name", () => {
+    testCase("transliterated", sumojungle);
   });
 });

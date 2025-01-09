@@ -35,12 +35,16 @@ export default class rymUi {
   }
 
   private get singleByArtist(): string {
-    // Not using innerText because it doesn't work with Jest tests.
-    const byArtistSpans = Array.from(document.getElementsByTagName("span"))
-      .filter(x => !!x.hasAttribute("itemprop") && x.getAttribute("itemprop") === this.byArtistProperty);
-    return byArtistSpans.length === 1
-      ? byArtistSpans[0].textContent ?? ""
-      : "";
+    return Array.from(document.querySelectorAll(`span[itemprop='${this.byArtistProperty}'] > a`))
+      .map(e => this.parseArtistLink(e))
+      .join(" / ");
+  }
+
+  private parseArtistLink(element: Element) {
+    return Array.from(element.childNodes)
+      .filter(node => node.nodeType === 3) // Node.TEXT_NODE
+      .map(node => node.textContent?.trim() ?? "")
+      .join("");
   }
 
   hasTrackNumber(tracklistLine: HTMLDivElement): boolean {
