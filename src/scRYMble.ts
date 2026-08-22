@@ -37,6 +37,7 @@ function acceptSubmitResponse(responseDetails: HttpResponse, isBatch: boolean) {
   }
 
   if (isBatch) {
+    _scRYMbleUi.elementsOn();
     _scRYMbleUi.setMarquee("Scrobbled OK!");
   } else {
     scrobbleNextSong();
@@ -68,51 +69,57 @@ function acceptNPResponse(responseDetails: HttpResponse) {
 function submitTracksBatch(sessID: string, submitURL: string) {
   toScrobble = uiParser.buildListOfSongsToScrobble(_rymUi, _scRYMbleUi);
 
-  if (toScrobble === null)
+  if (toScrobble === null) {
+    _scRYMbleUi.elementsOn();
     return;
+  }
 
   let currTime = fetch_unix_timestamp();
   const hoursFudgeStr = prompt("How many hours ago did you listen to this?");
-  if (hoursFudgeStr !== null) {
-    const album = _rymUi.pageAlbum;
-    const hoursFudge = parseFloat(hoursFudgeStr);
 
-    if (!isNaN(hoursFudge)) {
-      currTime = currTime - hoursFudge * 60 * 60;
-    }
-
-    for (let i = toScrobble.length - 1; i >= 0; i--) {
-      currTime = currTime * 1 - toScrobble[i].duration * 1;
-      toScrobble[i].time = currTime;
-    }
-
-    let outstr = `Artist: ${_rymUi.pageArtist}\nAlbum: ${album}\n`;
-
-    for (const song of toScrobble) {
-      outstr = `${outstr}${song.trackName} (${song.duration})\n`;
-    }
-
-    const postdata = {} as IDictionary;
-
-    for (let i = 0; i < toScrobble.length; i++) {
-      postdata[`a[${i}]`] = toScrobble[i].artist;
-      postdata[`t[${i}]`] = toScrobble[i].trackName;
-      postdata[`b[${i}]`] = album;
-      postdata[`n[${i}]`] = `${i + 1}`;
-      postdata[`l[${i}]`] = `${toScrobble[i].duration}`;
-      postdata[`i[${i}]`] = `${toScrobble[i].time}`;
-      postdata[`o[${i}]`] = "P";
-      postdata[`r[${i}]`] = "";
-      postdata[`m[${i}]`] = "";
-    }
-
-    postdata["s"] = sessID;
-
-    const postdataStr = Object.entries(postdata)
-      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-      .join("&");
-    httpRequestHelper.httpPost(submitURL, postdataStr, acceptSubmitResponseBatch, handleNetworkError);
+  if (hoursFudgeStr === null) {
+    _scRYMbleUi.elementsOn();
+    return;
   }
+
+  const album = _rymUi.pageAlbum;
+  const hoursFudge = parseFloat(hoursFudgeStr);
+
+  if (!isNaN(hoursFudge)) {
+    currTime = currTime - hoursFudge * 60 * 60;
+  }
+
+  for (let i = toScrobble.length - 1; i >= 0; i--) {
+    currTime = currTime * 1 - toScrobble[i].duration * 1;
+    toScrobble[i].time = currTime;
+  }
+
+  let outstr = `Artist: ${_rymUi.pageArtist}\nAlbum: ${album}\n`;
+
+  for (const song of toScrobble) {
+    outstr = `${outstr}${song.trackName} (${song.duration})\n`;
+  }
+
+  const postdata = {} as IDictionary;
+
+  for (let i = 0; i < toScrobble.length; i++) {
+    postdata[`a[${i}]`] = toScrobble[i].artist;
+    postdata[`t[${i}]`] = toScrobble[i].trackName;
+    postdata[`b[${i}]`] = album;
+    postdata[`n[${i}]`] = `${i + 1}`;
+    postdata[`l[${i}]`] = `${toScrobble[i].duration}`;
+    postdata[`i[${i}]`] = `${toScrobble[i].time}`;
+    postdata[`o[${i}]`] = "P";
+    postdata[`r[${i}]`] = "";
+    postdata[`m[${i}]`] = "";
+  }
+
+  postdata["s"] = sessID;
+
+  const postdataStr = Object.entries(postdata)
+    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+    .join("&");
+  httpRequestHelper.httpPost(submitURL, postdataStr, acceptSubmitResponseBatch, handleNetworkError);
 }
 
 function startScrobble(): void {
@@ -220,22 +227,20 @@ function acceptHandshakeBatch(responseDetails: HttpResponse) {
 }
 
 function acceptHandshake(responseDetails: HttpResponse, isBatch: boolean) {
-  if (responseDetails.status === 200) {
-    if (!responseDetails.isOkStatus) {
-      alertHandshakeFailed(responseDetails);
-    } else {
-      sessID = responseDetails.sessionId;
-      npURL = responseDetails.nowPlayingUrl;
-      submitURL = responseDetails.submitUrl;
-
-      if (isBatch) {
-        submitTracksBatch(sessID, submitURL);
-      } else {
-        npNextTrack();
-      }
-    }
-  } else {
+  if (responseDetails.status !== 200 || !responseDetails.isOkStatus) {
     alertHandshakeFailed(responseDetails);
+    resetScrobbler();
+    return;
+  }
+
+  sessID = responseDetails.sessionId;
+  npURL = responseDetails.nowPlayingUrl;
+  submitURL = responseDetails.submitUrl;
+
+  if (isBatch) {
+    submitTracksBatch(sessID, submitURL);
+  } else {
+    npNextTrack();
   }
 }
 
@@ -249,6 +254,7 @@ function handleNetworkError(responseDetails: HttpResponseRaw) {
 }
 
 function handshakeBatch(): void {
+  _scRYMbleUi.elementsOff();
   handshake(_scRYMbleUi, acceptHandshakeBatch, handleNetworkError);
 }
 

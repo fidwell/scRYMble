@@ -130,22 +130,19 @@ export default class scRYMbleUi {
   }
 
   elementsOnAndOff(state: boolean): void {
-    if (state) {
-      this.scrobbleNowButton.removeAttribute("disabled");
-      this.usernameInput.removeAttribute("disabled");
-      this.passwordInput.removeAttribute("disabled");
-    } else {
-      this.scrobbleNowButton.setAttribute("disabled", "disabled");
-      this.usernameInput.setAttribute("disabled", "disabled");
-      this.passwordInput.setAttribute("disabled", "disabled");
+    const controls: (HTMLInputElement | HTMLButtonElement)[] = [
+      this.scrobbleNowButton,
+      this.scrobbleThenButton,
+      this.usernameInput,
+      this.passwordInput
+    ];
+
+    for (const control of controls) {
+      control.toggleAttribute("disabled", !state);
     }
 
     for (const checkbox of this.checkboxes) {
-      if (state) {
-        checkbox.removeAttribute("disabled");
-      } else {
-        checkbox.setAttribute("disabled", "disabled");
-      }
+      checkbox.toggleAttribute("disabled", !state);
     }
   }
 
