@@ -66,13 +66,8 @@ function acceptNPResponse(responseDetails: HttpResponse) {
   }
 }
 
-function submitTracksBatch(sessID: string, submitURL: string) {
+function submitTracksBatch() {
   toScrobble = uiParser.buildListOfSongsToScrobble(_rymUi, _scRYMbleUi);
-
-  if (toScrobble === null) {
-    _scRYMbleUi.elementsOn();
-    return;
-  }
 
   let currTime = fetch_unix_timestamp();
   const hoursFudgeStr = prompt("How many hours ago did you listen to this?");
@@ -238,7 +233,7 @@ function acceptHandshake(responseDetails: HttpResponse, isBatch: boolean) {
   submitURL = responseDetails.submitUrl;
 
   if (isBatch) {
-    submitTracksBatch(sessID, submitURL);
+    submitTracksBatch();
   } else {
     npNextTrack();
   }

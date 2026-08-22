@@ -1,9 +1,9 @@
-const now = new Date(new Date().toUTCString().slice(0, -4));
+const now = new Date();
 
 function pad(value) {
   return `00${value}`.slice(-2);
 }
 
 export function getVersion() {
-  return `2.${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+  return `2.${now.getUTCFullYear()}${pad(now.getUTCMonth() + 1)}${pad(now.getUTCDate())}${pad(now.getUTCHours())}${pad(now.getUTCMinutes())}${pad(now.getUTCSeconds())}`;
 }

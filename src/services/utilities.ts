@@ -1,5 +1,5 @@
 export function fetch_unix_timestamp(): number {
-  return parseInt(new Date().getTime().toString().substring(0, 10));
+  return Math.floor(Date.now() / 1000);
 }
 
 function decodeHtmlEntities(value: string): string {
