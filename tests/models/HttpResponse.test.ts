@@ -56,4 +56,36 @@ describe("HttpResponse", () => {
     expect(response.nowPlayingUrl).toBe("");
     expect(response.submitUrl).toBe("");
   });
+
+  test("upgrades http urls returned by the server to https", () => {
+    const response = new HttpResponse(makeRaw(
+      "OK\nsess\nhttp://post2.audioscrobbler.com/np\nhttp://post2.audioscrobbler.com/sub"
+    ));
+    expect(response.nowPlayingUrl).toBe("https://post2.audioscrobbler.com/np");
+    expect(response.submitUrl).toBe("https://post2.audioscrobbler.com/sub");
+  });
+
+  test("strips the explicit port 80 the legacy protocol returns", () => {
+    const response = new HttpResponse(makeRaw(
+      "OK\nsess\nhttp://post2.audioscrobbler.com:80/np_1.2?k=abc\nhttp://post2.audioscrobbler.com:80/sub_1.2?k=abc"
+    ));
+    expect(response.nowPlayingUrl).toBe("https://post2.audioscrobbler.com/np_1.2?k=abc");
+    expect(response.submitUrl).toBe("https://post2.audioscrobbler.com/sub_1.2?k=abc");
+  });
+
+  test("leaves non-80 ports alone", () => {
+    const response = new HttpResponse(makeRaw(
+      "OK\nsess\nhttp://post2.example.com:8080/np\nhttp://post2.example.com:8080/sub"
+    ));
+    expect(response.nowPlayingUrl).toBe("https://post2.example.com:8080/np");
+    expect(response.submitUrl).toBe("https://post2.example.com:8080/sub");
+  });
+
+  test("leaves https urls from the server untouched", () => {
+    const response = new HttpResponse(makeRaw(
+      "OK\nsess\nhttps://post2.audioscrobbler.com/np\nhttps://post2.audioscrobbler.com/sub"
+    ));
+    expect(response.nowPlayingUrl).toBe("https://post2.audioscrobbler.com/np");
+    expect(response.submitUrl).toBe("https://post2.audioscrobbler.com/sub");
+  });
 });

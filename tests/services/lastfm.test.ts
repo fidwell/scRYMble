@@ -60,7 +60,7 @@ describe("lastfm handshake", () => {
 
     const timestamp = 1724000000;
     const expectedAuth = hex_md5(`${hex_md5(PASSWORD)}${timestamp}`);
-    const expectedUrl = `http://post.audioscrobbler.com/?hs=true&p=1.2&c=scr&v=1.0&u=${encodeURIComponent(USERNAME)}&t=${timestamp}&a=${expectedAuth}`;
+    const expectedUrl = `https://post.audioscrobbler.com/?hs=true&p=1.2&c=scr&v=1.0&u=${encodeURIComponent(USERNAME)}&t=${timestamp}&a=${expectedAuth}`;
 
     expect(captured?.url).toBe(expectedUrl);
   });

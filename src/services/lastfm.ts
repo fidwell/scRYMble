@@ -38,6 +38,6 @@ export function handshake(
   const timestamp = fetch_unix_timestamp();
   const auth = hex_md5(`${hex_md5(password)}${timestamp}`);
 
-  const handshakeURL = `http://post.audioscrobbler.com/?hs=true&p=1.2&c=scr&v=1.0&u=${encodeURIComponent(username)}&t=${timestamp}&a=${auth}`;
+  const handshakeURL = `https://post.audioscrobbler.com/?hs=true&p=1.2&c=scr&v=1.0&u=${encodeURIComponent(username)}&t=${timestamp}&a=${auth}`;
   httpGet(handshakeURL, callback, onError);
 }

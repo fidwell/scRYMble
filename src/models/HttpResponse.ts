@@ -4,6 +4,12 @@ export class HttpResponseRaw {
   responseText = "";
 }
 
+function secureUrl(url: string): string {
+  return url
+    .replace(/^http:\/\//i, "https://")
+    .replace(/^(https:\/\/[^/:]+):80(?=\/|$)/i, "$1");
+}
+
 export class HttpResponse {
   status: number;
   statusText: string;
@@ -30,10 +36,10 @@ export class HttpResponse {
   }
 
   get nowPlayingUrl(): string {
-    return this.line(2);
+    return secureUrl(this.line(2));
   }
 
   get submitUrl(): string {
-    return this.line(3);
+    return secureUrl(this.line(3));
   }
 }
