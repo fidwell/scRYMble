@@ -2,22 +2,30 @@ export function fetch_unix_timestamp(): number {
   return parseInt(new Date().getTime().toString().substring(0, 10));
 }
 
+function decodeHtmlEntities(value: string): string {
+  const textarea = document.createElement("textarea");
+  textarea.innerHTML = value;
+  return textarea.value;
+}
+
 export function stripAndClean(input: string): string {
-  input = input
-    .replace("&amp;", "")
-    .replace("\n", " ");
+  let result = decodeHtmlEntities(input)
+    .replace(/\n/g, " ")
+    .replace(/\u00A0/g, " ")
+    .replace(/ {2,}/g, " ")
+    .trim();
 
-  while (input.indexOf("  ") >= 0) {
-    input = input.replace("  ", " ");
+  while (result.startsWith("& - ")) {
+    result = result.substring(4);
   }
 
-  while (input.startsWith(" - ")) {
-    input = input.substring(3);
+  while (result.startsWith(" - ")) {
+    result = result.substring(3);
   }
 
-  while (input.startsWith("- ")) {
-    input = input.substring(2);
+  while (result.startsWith("- ")) {
+    result = result.substring(2);
   }
 
-  return input.trim();
+  return result;
 }
