@@ -1,13 +1,13 @@
 import replace from "@rollup/plugin-replace";
 import terser from "@rollup/plugin-terser";
-import typescript from "rollup-plugin-typescript2";
+import typescript from "@rollup/plugin-typescript";
 import { scRYMbleBanner } from "./meta/scRYMbleBanner.js";
 import { getVersion } from "./meta/version.js";
 
 export default {
   input: "src/scRYMble.ts",
   plugins: [
-    typescript(),
+    typescript({ tsconfig: "./tsconfig.json" }),
     replace({
       preventAssignment: true,
       __buildDate__: getVersion
