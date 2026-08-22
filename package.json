@@ -20,6 +20,9 @@
   ],
   "license": "ISC",
   "description": "Visit a release page on rateyourmusic.com and scrobble the songs you see!",
+  "overrides": {
+    "js-yaml": "^4.3.1"
+  },
   "devDependencies": {
     "@eslint/js": "^9.6.0",
     "@rollup/plugin-replace": "^5.0.7",
