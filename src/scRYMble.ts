@@ -29,6 +29,8 @@ function confirmBrowseAway(oEvent: BeforeUnloadEvent): string {
 function acceptSubmitResponse(responseDetails: HttpResponse, isBatch: boolean) {
   if (!responseDetails.isOkStatus) {
     alertRequestFailed(responseDetails);
+    resetScrobbler();
+    return;
   }
 
   if (isBatch) {
