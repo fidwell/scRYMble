@@ -61,7 +61,7 @@ function submitTracksBatch() {
   toScrobble = uiParser.buildListOfSongsToScrobble(_rymUi, _scRYMbleUi);
 
   let currTime = fetch_unix_timestamp();
-  const hoursFudgeStr = prompt("How many hours ago did you listen to this?");
+  const hoursFudgeStr = prompt("How many hours ago did you finish listening to this?");
 
   if (hoursFudgeStr === null) {
     _scRYMbleUi.elementsOn();
@@ -76,7 +76,7 @@ function submitTracksBatch() {
   }
 
   for (let i = toScrobble.length - 1; i >= 0; i--) {
-    currTime = currTime * 1 - toScrobble[i].duration * 1;
+    currTime -= toScrobble[i].duration;
     toScrobble[i].time = currTime;
   }
 
