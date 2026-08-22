@@ -1,6 +1,13 @@
 import { HttpResponse, HttpResponseRaw } from "../models/HttpResponse";
+import { IDictionary } from "../models/IDictionary";
 
 const REQUEST_TIMEOUT_MS = 30000;
+
+export function encodeParams(params: IDictionary): string {
+  return Object.entries(params)
+    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+    .join("&");
+}
 
 export function httpGet(
   url: string,

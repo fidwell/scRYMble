@@ -1,7 +1,28 @@
 import { HttpResponse, HttpResponseRaw } from "../models/HttpResponse";
+import { IDictionary } from "../models/IDictionary";
+import ScrobbleRecord from "../models/ScrobbleRecord";
 import { httpGet } from "./httpRequestHelper";
 import scRYMbleUi from "./scrymbleUi";
 import { fetch_unix_timestamp } from "./utilities";
+
+export function buildScrobbleParams(
+  song: ScrobbleRecord,
+  index: number,
+  album: string,
+  time: number
+): IDictionary {
+  return {
+    [`a[${index}]`]: song.artist,
+    [`t[${index}]`]: song.trackName,
+    [`b[${index}]`]: album,
+    [`n[${index}]`]: `${index + 1}`,
+    [`l[${index}]`]: `${song.duration}`,
+    [`i[${index}]`]: `${time}`,
+    [`o[${index}]`]: "P",
+    [`r[${index}]`]: "",
+    [`m[${index}]`]: ""
+  };
+}
 
 export function handshake(
   ui: scRYMbleUi,

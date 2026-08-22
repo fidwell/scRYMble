@@ -42,11 +42,18 @@ describe("HttpResponse", () => {
     expect(response.responseText).toBe(text);
   });
 
-  test("an empty body is not OK and yields undefined session data", () => {
+  test("an empty body is not OK and yields empty session fields", () => {
     const response = new HttpResponse(makeRaw(""));
     expect(response.isOkStatus).toBe(false);
-    expect(response.sessionId).toBeUndefined();
-    expect(response.nowPlayingUrl).toBeUndefined();
-    expect(response.submitUrl).toBeUndefined();
+    expect(response.sessionId).toBe("");
+    expect(response.nowPlayingUrl).toBe("");
+    expect(response.submitUrl).toBe("");
+  });
+
+  test("a truncated body yields empty strings for missing lines", () => {
+    const response = new HttpResponse(makeRaw("OK\nsess"));
+    expect(response.sessionId).toBe("sess");
+    expect(response.nowPlayingUrl).toBe("");
+    expect(response.submitUrl).toBe("");
   });
 });

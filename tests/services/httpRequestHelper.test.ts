@@ -1,5 +1,6 @@
 import { HttpResponse, HttpResponseRaw } from "../../src/models/HttpResponse";
-import { httpGet, httpPost } from "../../src/services/httpRequestHelper";
+import { encodeParams, httpGet, httpPost } from "../../src/services/httpRequestHelper";
+import { IDictionary } from "../../src/models/IDictionary";
 
 interface CapturedRequestDetails {
   method?: string;
@@ -97,5 +98,23 @@ describe("httpRequestHelper", () => {
       "Content-type": "application/x-www-form-urlencoded"
     });
     expect(captured?.timeout).toBe(30000);
+  });
+});
+
+describe("encodeParams", () => {
+  test("encodes special characters in both keys and values", () => {
+    const params: IDictionary = { "a[0]": "Simon & Garfunkel", s: "abc123" };
+
+    expect(encodeParams(params)).toBe("a%5B0%5D=Simon%20%26%20Garfunkel&s=abc123");
+  });
+
+  test("preserves insertion order of the parameters", () => {
+    const params: IDictionary = { z: "1", a: "2", m: "3" };
+
+    expect(encodeParams(params)).toBe("z=1&a=2&m=3");
+  });
+
+  test("returns an empty string for an empty dictionary", () => {
+    expect(encodeParams({})).toBe("");
   });
 });

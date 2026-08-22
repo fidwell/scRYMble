@@ -1,8 +1,7 @@
 import { HttpResponse, HttpResponseRaw } from "./models/HttpResponse";
-import { IDictionary } from "./models/IDictionary";
 import ScrobbleRecord from "./models/ScrobbleRecord";
 import * as httpRequestHelper from "./services/httpRequestHelper";
-import { handshake } from "./services/lastfm";
+import { buildScrobbleParams, handshake } from "./services/lastfm";
 import rymUi from "./services/rymUi";
 import scRYMbleUi from "./services/scrymbleUi";
 import * as uiParser from "./services/uiParser";
@@ -28,12 +27,8 @@ function confirmBrowseAway(oEvent: BeforeUnloadEvent): string {
 }
 
 function acceptSubmitResponse(responseDetails: HttpResponse, isBatch: boolean) {
-  if (responseDetails.status === 200) {
-    if (!responseDetails.isOkStatus) {
-      alertSubmitFailed(responseDetails);
-    }
-  } else {
-    alertSubmitFailed(responseDetails);
+  if (!responseDetails.isOkStatus) {
+    alertRequestFailed(responseDetails);
   }
 
   if (isBatch) {
@@ -44,7 +39,7 @@ function acceptSubmitResponse(responseDetails: HttpResponse, isBatch: boolean) {
   }
 }
 
-function alertSubmitFailed(responseDetails: HttpResponse) {
+function alertRequestFailed(responseDetails: HttpResponse) {
   alert(`Track submit failed: ${responseDetails.status} ${responseDetails.statusText}\n\nData:\n${responseDetails.responseText}`);
 }
 
@@ -57,12 +52,8 @@ function acceptSubmitResponseBatch(responseDetails: HttpResponse) {
 }
 
 function acceptNPResponse(responseDetails: HttpResponse) {
-  if (responseDetails.status === 200) {
-    if (!responseDetails.isOkStatus) {
-      alertSubmitFailed(responseDetails);
-    }
-  } else {
-    alertSubmitFailed(responseDetails);
+  if (!responseDetails.isOkStatus) {
+    alertRequestFailed(responseDetails);
   }
 }
 
@@ -95,26 +86,15 @@ function submitTracksBatch() {
     outstr = `${outstr}${song.trackName} (${song.duration})\n`;
   }
 
-  const postdata = {} as IDictionary;
+  const postdata: Record<string, string> = {};
 
   for (let i = 0; i < toScrobble.length; i++) {
-    postdata[`a[${i}]`] = toScrobble[i].artist;
-    postdata[`t[${i}]`] = toScrobble[i].trackName;
-    postdata[`b[${i}]`] = album;
-    postdata[`n[${i}]`] = `${i + 1}`;
-    postdata[`l[${i}]`] = `${toScrobble[i].duration}`;
-    postdata[`i[${i}]`] = `${toScrobble[i].time}`;
-    postdata[`o[${i}]`] = "P";
-    postdata[`r[${i}]`] = "";
-    postdata[`m[${i}]`] = "";
+    Object.assign(postdata, buildScrobbleParams(toScrobble[i], i, album, toScrobble[i].time));
   }
 
   postdata["s"] = sessID;
 
-  const postdataStr = Object.entries(postdata)
-    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-    .join("&");
-  httpRequestHelper.httpPost(submitURL, postdataStr, acceptSubmitResponseBatch, handleNetworkError);
+  httpRequestHelper.httpPost(submitURL, httpRequestHelper.encodeParams(postdata), acceptSubmitResponseBatch, handleNetworkError);
 }
 
 function startScrobble(): void {
@@ -149,30 +129,17 @@ function scrobbleNextSong(): void {
 }
 
 function submitThisTrack(): void {
-  const postdata = {} as IDictionary;
-  const i = 0;
+  const song = toScrobble[currentlyScrobbling];
   const currTime = fetch_unix_timestamp();
 
-  postdata[`a[${i}]`] = toScrobble[currentlyScrobbling].artist;
-  postdata[`t[${i}]`] = toScrobble[currentlyScrobbling].trackName;
-  postdata[`b[${i}]`] = _rymUi.pageAlbum;
-  postdata[`n[${i}]`] = `${currentlyScrobbling + 1}`;
-  postdata[`l[${i}]`] = `${toScrobble[currentlyScrobbling].duration}`;
-  postdata[`i[${i}]`] = `${currTime - toScrobble[currentlyScrobbling].duration}`;
-  postdata[`o[${i}]`] = "P";
-  postdata[`r[${i}]`] = "";
-  postdata[`m[${i}]`] = "";
-
+  const postdata = buildScrobbleParams(song, currentlyScrobbling, _rymUi.pageAlbum, currTime - song.duration);
   postdata["s"] = sessID;
 
-  const postdataStr = Object.entries(postdata)
-    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-    .join("&");
-  httpRequestHelper.httpPost(submitURL, postdataStr, acceptSubmitResponseSingle, handleNetworkError);
+  httpRequestHelper.httpPost(submitURL, httpRequestHelper.encodeParams(postdata), acceptSubmitResponseSingle, handleNetworkError);
 }
 
 function npNextTrack() {
-  const postdata = {} as IDictionary;
+  const postdata: Record<string, string> = {};
   postdata["a"] = toScrobble[currentlyScrobbling].artist;
   postdata["t"] = toScrobble[currentlyScrobbling].trackName;
   postdata["b"] = _rymUi.pageAlbum;
@@ -186,10 +153,7 @@ function npNextTrack() {
 
   _scRYMbleUi.setMarquee(toScrobble[currentlyScrobbling].trackName);
 
-  const postdataStr = Object.entries(postdata)
-    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-    .join("&");
-  httpRequestHelper.httpPost(npURL, postdataStr, acceptNPResponse, handleNetworkError);
+  httpRequestHelper.httpPost(npURL, httpRequestHelper.encodeParams(postdata), acceptNPResponse, handleNetworkError);
 }
 
 function timertick() {

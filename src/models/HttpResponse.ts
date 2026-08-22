@@ -17,19 +17,23 @@ export class HttpResponse {
     this.lines = raw.responseText.split("\n");
   }
 
+  private line(index: number): string {
+    return this.lines[index] ?? "";
+  }
+
   get isOkStatus(): boolean {
     return this.lines[0] === "OK";
   }
 
   get sessionId(): string {
-    return this.lines[1];
+    return this.line(1);
   }
 
   get nowPlayingUrl(): string {
-    return this.lines[2];
+    return this.line(2);
   }
 
   get submitUrl(): string {
-    return this.lines[3];
+    return this.line(3);
   }
 }
