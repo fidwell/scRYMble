@@ -73,8 +73,8 @@ export default class scRYMbleUi {
         </tr>
       </table>
     </td>
-    <td>user: <input type="text" size="16" id="${this.usernameId}" value="${GM_getValue("user", "")}" /><br />
-        pass: <input type="password" size="16" id="${this.passwordId}" value="${GM_getValue("pass", "")}"></input><br />
+    <td>user: <input type="text" size="16" id="${this.usernameId}" /><br />
+        pass: <input type="password" size="16" id="${this.passwordId}" /><br />
         <input type="button" id="${this.scrobbleNowId}" value="Scrobble in real-time" />
         <input type="button" id="${this.scrobbleThenId}" value="Scrobble a previous play" />
         <input type="button" id="${this.testId}" value="Test tracklist parsing" style="display: none;" />
@@ -84,6 +84,8 @@ export default class scRYMbleUi {
     eleButtonDiv.style.textAlign = "right";
 
     this._rymUi.trackListDiv?.after(eleButtonDiv);
+    this.usernameInput.value = GM_getValue("user", "");
+    this.passwordInput.value = GM_getValue("pass", "");
     this.allOrNoneCheckbox.addEventListener("click", () => this.allOrNoneClick(), true);
 
     const marqueeStyle = document.createElement("style");
