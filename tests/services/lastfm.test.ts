@@ -2,8 +2,19 @@ import { JSDOM } from "jsdom";
 import { HttpResponse, HttpResponseRaw } from "../../src/models/HttpResponse";
 import ScrobbleRecord from "../../src/models/ScrobbleRecord";
 import { buildScrobbleParams, handshake } from "../../src/services/lastfm";
+import { hex_md5 } from "../../src/services/md5";
 import rymUi from "../../src/services/rymUi";
 import scRYMbleUi from "../../src/services/scrymbleUi";
+
+jest.mock("../../src/services/md5", () => ({
+  hex_md5: (value: string) => {
+    let hash = 7;
+    for (let i = 0; i < value.length; i++) {
+      hash = (hash * 31 + value.charCodeAt(i)) % 268435455;
+    }
+    return hash.toString(16);
+  }
+}));
 
 const USERNAME = "ann&bob +1";
 const PASSWORD = "secretpw!";
@@ -37,13 +48,6 @@ describe("lastfm handshake", () => {
     global.GM_xmlhttpRequest = (details: CapturedRequestDetails) => {
       captured = details;
     };
-    global.hex_md5 = (value: string) => {
-      let hash = 7;
-      for (let i = 0; i < value.length; i++) {
-        hash = (hash * 31 + value.charCodeAt(i)) % 268435455;
-      }
-      return hash.toString(16);
-    };
   });
 
   afterEach(() => {
@@ -55,7 +59,7 @@ describe("lastfm handshake", () => {
     handshake(new scRYMbleUi(new rymUi()), () => undefined, () => undefined);
 
     const timestamp = 1724000000;
-    const expectedAuth = global.hex_md5(`${global.hex_md5(PASSWORD)}${timestamp}`);
+    const expectedAuth = hex_md5(`${hex_md5(PASSWORD)}${timestamp}`);
     const expectedUrl = `http://post.audioscrobbler.com/?hs=true&p=1.2&c=scr&v=1.0&u=${encodeURIComponent(USERNAME)}&t=${timestamp}&a=${expectedAuth}`;
 
     expect(captured?.url).toBe(expectedUrl);

@@ -2,6 +2,7 @@ import { HttpResponse, HttpResponseRaw } from "../models/HttpResponse";
 import { IDictionary } from "../models/IDictionary";
 import ScrobbleRecord from "../models/ScrobbleRecord";
 import { httpGet } from "./httpRequestHelper";
+import { hex_md5 } from "./md5";
 import scRYMbleUi from "./scrymbleUi";
 import { fetch_unix_timestamp } from "./utilities";
 
