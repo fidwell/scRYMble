@@ -9,11 +9,10 @@ export default class ScrobbleRecord {
     this.trackName = trackName;
 
     const durastr = duration.trim();
-    const colon = durastr.indexOf(":");
-    if (colon !== -1) {
-      const minutes = parseInt(durastr.substring(0, colon));
-      const seconds = parseInt(durastr.substring(colon + 1));
-      this.duration = minutes * 60 + seconds;
+    if (durastr.indexOf(":") !== -1) {
+      this.duration = durastr
+        .split(":")
+        .reduce((totalSeconds, part) => totalSeconds * 60 + parseInt(part), 0);
     } else {
       this.duration = 180;
     }
