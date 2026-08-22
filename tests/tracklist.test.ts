@@ -1,14 +1,14 @@
 import * as fs from "fs";
 import { JSDOM } from "jsdom";
-import rymUi from "../services/rymUi";
-import scRYMbleUi from "../services/scrymbleUi";
-import * as uiParser from "../services/uiParser";
+import rymUi from "../src/services/rymUi";
+import scRYMbleUi from "../src/services/scrymbleUi";
+import * as uiParser from "../src/services/uiParser";
 import { braidWithLinks, braidWithoutLinks, dieMenschMaschine, headOnTheDoor, planets, sinkingOfTheTitanic, split, sumojungle } from "./data/expected";
 import TestModel from "./models/TestModel";
 
 describe("Tracklist parsing tests", () => {
   function setup(filename: string) {
-    const html = fs.readFileSync(`./src/tests/data/${filename}.htm`, "utf-8");
+    const html = fs.readFileSync(`./tests/data/${filename}.htm`, "utf-8");
     const dom = new JSDOM(html);
     global.document = dom.window.document;
     global.navigator = dom.window.navigator;

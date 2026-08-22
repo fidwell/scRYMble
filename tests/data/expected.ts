@@ -1,4 +1,4 @@
-import ScrobbleRecord from "../../models/ScrobbleRecord";
+import ScrobbleRecord from "../../src/models/ScrobbleRecord";
 import TestModel from "../models/TestModel";
 
 export const headOnTheDoor: TestModel = {
