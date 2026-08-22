@@ -1,4 +1,4 @@
-import { HttpResponse } from "./models/HttpResponse";
+import { HttpResponse, HttpResponseRaw } from "./models/HttpResponse";
 import { IDictionary } from "./models/IDictionary";
 import ScrobbleRecord from "./models/ScrobbleRecord";
 import * as httpRequestHelper from "./services/httpRequestHelper";
@@ -111,7 +111,7 @@ function submitTracksBatch(sessID: string, submitURL: string) {
     const postdataStr = Object.entries(postdata)
       .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
       .join("&");
-    httpRequestHelper.httpPost(submitURL, postdataStr, acceptSubmitResponseBatch);
+    httpRequestHelper.httpPost(submitURL, postdataStr, acceptSubmitResponseBatch, handleNetworkError);
   }
 }
 
@@ -142,7 +142,7 @@ function scrobbleNextSong(): void {
     resetScrobbler();
   } else {
     window.setTimeout(timertick, 10);
-    handshake(_scRYMbleUi, acceptHandshakeSingle);
+    handshake(_scRYMbleUi, acceptHandshakeSingle, handleNetworkError);
   }
 }
 
@@ -166,7 +166,7 @@ function submitThisTrack(): void {
   const postdataStr = Object.entries(postdata)
     .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
     .join("&");
-  httpRequestHelper.httpPost(submitURL, postdataStr, acceptSubmitResponseSingle);
+  httpRequestHelper.httpPost(submitURL, postdataStr, acceptSubmitResponseSingle, handleNetworkError);
 }
 
 function npNextTrack() {
@@ -187,7 +187,7 @@ function npNextTrack() {
   const postdataStr = Object.entries(postdata)
     .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
     .join("&");
-  httpRequestHelper.httpPost(npURL, postdataStr, acceptNPResponse);
+  httpRequestHelper.httpPost(npURL, postdataStr, acceptNPResponse, handleNetworkError);
 }
 
 function timertick() {
@@ -206,7 +206,7 @@ function timertick() {
 
   }
 
-  if (again) {
+  if (again && currentlyScrobbling !== -1) {
     window.setTimeout(timertick, 1000);
   }
 }
@@ -243,8 +243,13 @@ function alertHandshakeFailed(responseDetails: HttpResponse) {
   alert(`Handshake failed: ${responseDetails.status} ${responseDetails.statusText}\n\nData:\n${responseDetails.responseText}`);
 }
 
+function handleNetworkError(responseDetails: HttpResponseRaw) {
+  alert(`Network request failed: ${responseDetails.status} ${responseDetails.statusText}\n\nCheck your internet connection and try again.\n\nData:\n${responseDetails.responseText}`);
+  resetScrobbler();
+}
+
 function handshakeBatch(): void {
-  handshake(_scRYMbleUi, acceptHandshakeBatch);
+  handshake(_scRYMbleUi, acceptHandshakeBatch, handleNetworkError);
 }
 
 function scrobbleTest(): void {
