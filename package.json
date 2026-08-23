@@ -2,7 +2,6 @@
   "name": "scrymble",
   "version": "2.0.0",
   "type": "module",
-  "main": "scRYMble.js",
   "scripts": {
     "build": "eslint . && rollup -c",
     "lint": "eslint .",
@@ -18,7 +17,7 @@
     "Kronz",
     "Carcinogeneration"
   ],
-  "license": "ISC",
+  "license": "MIT",
   "description": "Visit a release page on rateyourmusic.com and scrobble the songs you see!",
   "overrides": {
     "js-yaml": "^4.3.1"
