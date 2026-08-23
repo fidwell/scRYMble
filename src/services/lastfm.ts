@@ -8,6 +8,7 @@ import { fetch_unix_timestamp } from "./utilities";
 
 export const PASSWORD_HASH_KEY = "pwhash";
 export const LEGACY_PASSWORD_KEY = "pass";
+const CLOCK_OFFSET_KEY = "clockOffsetSeconds";
 
 export function buildScrobbleParams(
   song: ScrobbleRecord,
@@ -37,11 +38,41 @@ export function handshake(
   GM_setValue("user", username);
 
   const passwordHash = resolveStoredHash(ui.password);
-  const timestamp = fetch_unix_timestamp();
+  sendHandshake(username, passwordHash, callback, onError, true);
+}
+
+function sendHandshake(
+  username: string,
+  passwordHash: string,
+  callback: (response: HttpResponse) => void,
+  onError: (responseRaw: HttpResponseRaw) => void,
+  mayRetryForClockSkew: boolean
+) {
+  const timestamp = correctedUnixTimestamp();
   const auth = hex_md5(`${passwordHash}${timestamp}`);
 
   const handshakeURL = `https://post.audioscrobbler.com/?hs=true&p=1.2&c=scr&v=1.0&u=${encodeURIComponent(username)}&t=${timestamp}&a=${auth}`;
-  httpGet(handshakeURL, callback, onError);
+  httpGet(handshakeURL, response => {
+    if (mayRetryForClockSkew && response.responseText.trim() === "BADTIME") {
+      learnClockOffset(response);
+      sendHandshake(username, passwordHash, callback, onError, false);
+      return;
+    }
+
+    callback(response);
+  }, onError);
+}
+
+function learnClockOffset(response: HttpResponse): void {
+  const serverTimeMs = response.serverTimeMs();
+  if (serverTimeMs !== null) {
+    GM_setValue(CLOCK_OFFSET_KEY, `${Math.round((serverTimeMs - Date.now()) / 1000)}`);
+  }
+}
+
+function correctedUnixTimestamp(): number {
+  const offsetSeconds = parseInt(GM_getValue(CLOCK_OFFSET_KEY, "0"), 10);
+  return fetch_unix_timestamp() + (isNaN(offsetSeconds) ? 0 : offsetSeconds);
 }
 
 function resolveStoredHash(typedPassword: string): string {

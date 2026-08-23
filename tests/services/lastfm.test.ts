@@ -26,6 +26,17 @@ interface CapturedRequestDetails {
   onerror?: (responseRaw: unknown) => void;
 }
 
+function makeHandshakeResponse(text: string, dateHeader?: string): HttpResponseRaw {
+  const raw = new HttpResponseRaw();
+  raw.status = 200;
+  raw.statusText = "OK";
+  raw.responseText = text;
+  if (dateHeader !== undefined) {
+    raw.responseHeaders = `content-type: text/plain\r\ndate: ${dateHeader}\r\n`;
+  }
+  return raw;
+}
+
 describe("lastfm handshake", () => {
   let captured: CapturedRequestDetails | undefined;
   const setValueMock = jest.fn();
@@ -123,6 +134,47 @@ describe("lastfm handshake", () => {
     expect(captured?.url).toContain(`a=${hex_md5(`${hex_md5(legacyPassword)}${timestamp}`)}`);
     expect(setValueMock).toHaveBeenCalledWith("pwhash", hex_md5(legacyPassword));
     expect(deleteValueMock).toHaveBeenCalledWith("pass");
+  });
+
+  test("retries with corrected time when the server reports BADTIME", () => {
+    handshake(new scRYMbleUi(new rymUi()), () => undefined, () => undefined);
+
+    const skewMs = 90 * 1000;
+    captured?.onload?.(makeHandshakeResponse(
+      "BADTIME",
+      new Date(FIXED_NOW_MS + skewMs).toUTCString()
+    ));
+
+    const secondUrl = captured?.url ?? "";
+    expect(secondUrl).toContain(`t=${1724000000 + 90}`);
+    expect(setValueMock).toHaveBeenCalledWith("clockOffsetSeconds", "90");
+  });
+
+  test("retries only once before giving the response to the caller", () => {
+    let handedOver: HttpResponse | undefined;
+    handshake(new scRYMbleUi(new rymUi()), response => {
+      handedOver = response;
+    }, () => undefined);
+
+    const badTimeRaw = makeHandshakeResponse(
+      "BADTIME",
+      new Date(FIXED_NOW_MS + 60000).toUTCString()
+    );
+    captured?.onload?.(badTimeRaw);
+    captured?.onload?.(makeHandshakeResponse(
+      "BADTIME",
+      new Date(FIXED_NOW_MS + 60000).toUTCString()
+    ));
+
+    expect(handedOver?.responseText).toBe("BADTIME");
+  });
+
+  test("applies a previously learned clock offset immediately", () => {
+    storage.set("clockOffsetSeconds", "90");
+
+    handshake(new scRYMbleUi(new rymUi()), () => undefined, () => undefined);
+
+    expect(captured?.url).toContain("t=1724000090");
   });
 
   test("forwards success and error handlers to the request", () => {

@@ -206,6 +206,11 @@ function acceptHandshake(responseDetails: HttpResponse, isBatch: boolean) {
 }
 
 function alertHandshakeFailed(responseDetails: HttpResponse) {
+  if (responseDetails.responseText.indexOf("BADTIME") !== -1) {
+    alert("Handshake failed: Last.fm rejected this computer's time, even after scRYMble corrected for the difference it reported.\n\nPlease fix your system clock (check date, time, and time zone) and try again.");
+    return;
+  }
+
   alert(`Handshake failed: ${responseDetails.status} ${responseDetails.statusText}\n\nData:\n${responseDetails.responseText}`);
 }
 
