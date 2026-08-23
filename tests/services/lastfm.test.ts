@@ -29,10 +29,14 @@ interface CapturedRequestDetails {
 describe("lastfm handshake", () => {
   let captured: CapturedRequestDetails | undefined;
   const setValueMock = jest.fn();
+  const deleteValueMock = jest.fn();
+  const storage = new Map<string, string>();
 
   beforeEach(() => {
     captured = undefined;
     setValueMock.mockClear();
+    deleteValueMock.mockClear();
+    storage.clear();
 
     jest.useFakeTimers();
     jest.setSystemTime(new Date(FIXED_NOW_MS));
@@ -44,7 +48,18 @@ describe("lastfm handshake", () => {
     (document.getElementById("scrobbleusername") as HTMLInputElement).value = USERNAME;
     (document.getElementById("scrobblepassword") as HTMLInputElement).value = PASSWORD;
 
-    global.GM_setValue = setValueMock;
+    global.GM_getValue = ((key: string, defaultValue?: string) => {
+      const stored = storage.get(key);
+      return stored !== undefined ? stored : defaultValue ?? "";
+    }) as typeof GM_getValue;
+    global.GM_setValue = (key: string, value: string) => {
+      setValueMock(key, value);
+      storage.set(key, value);
+    };
+    global.GM_deleteValue = (key: string) => {
+      deleteValueMock(key);
+      storage.delete(key);
+    };
     global.GM_xmlhttpRequest = (details: CapturedRequestDetails) => {
       captured = details;
     };
@@ -75,6 +90,39 @@ describe("lastfm handshake", () => {
     handshake(new scRYMbleUi(new rymUi()), () => undefined, () => undefined);
 
     expect(setValueMock).toHaveBeenCalledWith("user", USERNAME);
+  });
+
+  test("persists only the password hash, never the password", () => {
+    handshake(new scRYMbleUi(new rymUi()), () => undefined, () => undefined);
+
+    expect(setValueMock).toHaveBeenCalledWith("pwhash", hex_md5(PASSWORD));
+    expect(setValueMock).not.toHaveBeenCalledWith("pass", expect.anything());
+    expect(storage.has("pass")).toBe(false);
+    expect(deleteValueMock).toHaveBeenCalledWith("pass");
+  });
+
+  test("reuses the stored hash when the password field is left blank", () => {
+    storage.set("pwhash", "storedhash");
+    (document.getElementById("scrobblepassword") as HTMLInputElement).value = "";
+
+    handshake(new scRYMbleUi(new rymUi()), () => undefined, () => undefined);
+
+    const timestamp = 1724000000;
+    expect(captured?.url).toContain(`a=${hex_md5(`storedhash${timestamp}`)}`);
+    expect(setValueMock).not.toHaveBeenCalledWith("pwhash", expect.anything());
+  });
+
+  test("migrates legacy plaintext credentials and deletes them", () => {
+    const legacyPassword = "old-plaintext-pw";
+    storage.set("pass", legacyPassword);
+    (document.getElementById("scrobblepassword") as HTMLInputElement).value = "";
+
+    handshake(new scRYMbleUi(new rymUi()), () => undefined, () => undefined);
+
+    const timestamp = 1724000000;
+    expect(captured?.url).toContain(`a=${hex_md5(`${hex_md5(legacyPassword)}${timestamp}`)}`);
+    expect(setValueMock).toHaveBeenCalledWith("pwhash", hex_md5(legacyPassword));
+    expect(deleteValueMock).toHaveBeenCalledWith("pass");
   });
 
   test("forwards success and error handlers to the request", () => {

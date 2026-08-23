@@ -9,6 +9,7 @@ export const scRYMbleBanner = `// ==UserScript==
 // @include      https://rateyourmusic.com/release/*
 // @grant        GM_getValue
 // @grant        GM_setValue
+// @grant        GM_deleteValue
 // @grant        GM_xmlhttpRequest
 // @updateURL    https://greasyfork.org/en/scripts/500052-scrymble
 // @downloadURL  https://greasyfork.org/en/scripts/500052-scrymble

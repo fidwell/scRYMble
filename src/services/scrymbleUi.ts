@@ -1,3 +1,4 @@
+import { LEGACY_PASSWORD_KEY, PASSWORD_HASH_KEY } from "./lastfm";
 import rymUi from "./rymUi";
 
 export default class scRYMbleUi {
@@ -85,7 +86,12 @@ export default class scRYMbleUi {
 
     this._rymUi.trackListDiv?.after(eleButtonDiv);
     this.usernameInput.value = GM_getValue("user", "");
-    this.passwordInput.value = GM_getValue("pass", "");
+    if (
+      GM_getValue(PASSWORD_HASH_KEY, "").length > 0 ||
+      GM_getValue(LEGACY_PASSWORD_KEY, "").length > 0
+    ) {
+      this.passwordInput.placeholder = "(saved)";
+    }
     this.allOrNoneCheckbox.addEventListener("click", () => this.allOrNoneClick(), true);
 
     const marqueeStyle = document.createElement("style");
