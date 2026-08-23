@@ -4,6 +4,19 @@ import typescript from "@rollup/plugin-typescript";
 import { scRYMbleBanner } from "./meta/scRYMbleBanner.js";
 import { getVersion } from "./meta/version.js";
 
+function userscriptBanner() {
+  return {
+    name: "userscript-banner",
+    generateBundle(_options, bundle) {
+      for (const file of Object.values(bundle)) {
+        if (file.type === "chunk") {
+          file.code = `${scRYMbleBanner}\n${file.code}`;
+        }
+      }
+    }
+  };
+}
+
 export default {
   input: "src/scRYMble.ts",
   plugins: [
@@ -15,21 +28,14 @@ export default {
   ],
   output: [
     {
-      banner: scRYMbleBanner,
       file: "dist/scRYMble.js",
-      format: "cjs"
+      format: "cjs",
+      plugins: [userscriptBanner()]
     },
     {
-      banner: scRYMbleBanner,
       file: "dist/scRYMble.min.js",
       format: "iife",
-      plugins: [
-        terser({
-          format: {
-            comments: "all"
-          }
-        })
-      ]
+      plugins: [terser(), userscriptBanner()]
     }
   ]
 };
