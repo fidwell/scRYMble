@@ -16,15 +16,15 @@ Visit any release page on RateYourMusic (`https://rateyourmusic.com/release/*`) 
 
 ![image](https://github.com/user-attachments/assets/ba979199-64de-47cd-9356-8368b5e3f9aa)
 
-Fill in your last.fm username and password. You can also check and uncheck tracks you wish to scrobble or ignore.
+Fill in your last.fm username and password. (Your credentials are remembered between visits, and your password is stored locally only hashed, never in plain text.) You can also check and uncheck tracks you wish to scrobble or ignore.
 
-### Scrobble in real time
+### Scrobble in real-time
 
-If you want the page to scrobble along with you as you listen, click the "Scrobble in real time" button. scRYMble will start a timer for each track based on the listed duration, and submit the scrobble when the time is up. (If no duration is listed, a default of 3 minutes is used.)
+If you want the page to scrobble along with you as you listen, click the "Scrobble in real-time" button. scRYMble will start a timer for each track based on the listed duration, and submit the scrobble when the time is up. (If no duration is listed, a default of 3 minutes is used.)
 
 ### Scrobble a previous play
 
-If you already finished listening to the release, click the "Scrobble in real time" button. You can then enter how long ago, in hours, you listened to the release. scRYMble will then submit all checked tracks in a batch. (You can submit fractional hours, too; for example, enter `0.5` for half an hour ago.)
+If you already finished listening to the release, click the "Scrobble a previous play" button. You can then enter how long ago, in hours, you listened to the release. scRYMble will then submit all checked tracks in a batch. (You can submit fractional hours, too; for example, enter `0.5` for half an hour ago.)
 
 ## About
 
@@ -44,3 +44,9 @@ scRYMble was created by [bluetshirt](https://rateyourmusic.com/~bluetshirt) in 2
 4. Run `npm run build` to build the project. Compiled and minified .js files will be added to the `dist` folder. You can paste the contents of those files into your script manager extension.
 
 You can also use `npm run lint` to just run the linter to find style errors, or `npm run lint-fix` to fix them where possible.
+
+`npm test` runs the Jest test suite, which checks scRYMble's logic against saved HTML fixtures of real RYM pages. GitHub Actions runs the linter and tests on every push and pull request to `main`, and uploads the built files as an artifact.
+
+## License
+
+scRYMble is released under the [MIT License](LICENSE).
