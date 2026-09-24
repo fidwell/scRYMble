@@ -20,7 +20,7 @@
   "license": "MIT",
   "description": "Visit a release page on rateyourmusic.com and scrobble the songs you see!",
   "overrides": {
-    "js-yaml": "^4.3.1",
+    "js-yaml": "^4.3.2",
     "test-exclude": "^8.0.0"
   },
   "devDependencies": {
